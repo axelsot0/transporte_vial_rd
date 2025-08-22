@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Commutes – Santo Domingo</title>
+  <style>
+    /* contenedor básico: ocupa todo el alto del iframe */
+    html, body { height: 100%; margin: 0; }
+    .commutes { height: 100%; display: flex; flex-direction: column; }
+    .commutes-map { flex: 1; position: relative; }
+    .map-view { position:absolute; inset:0; }
+    /* si usas los estilos completos de Commutes, puedes pegarlos aquí */
+  </style>
+</head>
+<body>
+  <!-- layout mínimo para el widget -->
+  <main class="commutes" style="height:100%">
+  <div class="map-view" style="position:absolute; inset:0;"></div>
+
+  <section class="commutes-initial-state" style="display:none">
+    <button class="add-button">Add destination</button>
+  </section>
+
+  <section class="commutes-destinations">
+    <button class="left-control" data-direction="-1" style="display:none"></button>
+    <div class="destinations-container">
+      <div class="destination-list"></div>
+    </div>
+    <button class="right-control" data-direction="1" style="display:none"></button>
+    <button class="add-button">Add destination</button>
+  </section>
+
+  <div class="commutes-modal-container" style="display:none">
+    <form name="destination-form">
+      <input name="destination-address" />
+      <div>
+        <label><input type="radio" name="travel-mode" id="driving-mode" value="DRIVING" checked>Driving</label>
+        <label><input type="radio" name="travel-mode" id="walking-mode" value="WALKING">Walking</label>
+        <label><input type="radio" name="travel-mode" id="bicycling-mode" value="BICYCLING">Bicycling</label>
+        <label><input type="radio" name="travel-mode" id="transit-mode" value="TRANSIT">Transit</label>
+      </div>
+      <div class="error-message"></div>
+      <button type="button" class="add-destination-button">Add</button>
+      <button type="button" class="edit-destination-button" style="display:none">Save</button>
+      <button type="button" class="delete-destination-button" style="display:none">Delete</button>
+      <button type="button" class="cancel-button">Cancel</button>
+    </form>
+  </div>
+</main>
+
+
+  <!-- 1) CARGA el código que DEFINE Commutes ANTES del callback -->
+  <script src="/commutes.js"></script>
+  <!-- Si no tienes fichero, pega AQUÍ todo el JS que define function Commutes(...) -->
+
+  <!-- 2) Configuración y callback -->
+  <script>
+    const CONFIGURATION = {
+      defaultTravelMode: "PUBLIC_TRANSIT",
+      distanceMeasurementType: "METRIC",
+      mapOptions: {
+        center: { lat: 18.4861, lng: -69.9312 }, // Santo Domingo como origen
+        zoom: 13, fullscreenControl: true, mapTypeControl: false,
+        streetViewControl: false, zoomControl: true
+      },
+      // Puedes usar placeId o (si añadiste el "fallback" findPlaceFromQuery que te pasé) 'query'
+      initialDestinations: [
+        { query: "Palacio Nacional, Santo Domingo",          travelMode: "PUBLIC_TRANSIT" },
+        { query: "Av. Duarte, Santo Domingo",                travelMode: "PUBLIC_TRANSIT" },
+        { query: "Calle 16 de Agosto, Santo Domingo",        travelMode: "PUBLIC_TRANSIT" },
+        { query: "Av. Independencia, Santo Domingo",         travelMode: "PUBLIC_TRANSIT" },
+        { query: "Ágora Mall, Santo Domingo",                travelMode: "PUBLIC_TRANSIT" }
+      ],
+      mapsApiKey: "TU_API_KEY" // JS Maps + Places habilitadas
+    };
+
+    function initMap() {
+      // A esta altura, Commutes YA está definida por el script anterior
+      new Commutes(CONFIGURATION);
+    }
+  </script>
+
+  <!-- 3) Carga la Google Maps JS API con loading=async y callback -->
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=TU_API_KEY&libraries=places,geometry&callback=initMap&loading=async"
+    async
+    defer
+  ></script>
+</body>
+</html>

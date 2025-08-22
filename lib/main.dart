@@ -2,7 +2,19 @@ import 'package:flutter/material.dart';
 import 'core/constants/app_colors.dart';
 import 'core/widgets/main_scaffold.dart';
 
-void main() {
+import 'package:flutter/material.dart';
+import 'core/constants/app_colors.dart';
+import 'core/widgets/main_scaffold.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  if (!kIsWeb) {
+    try { await dotenv.load(fileName: ".env"); } catch (_) {}
+  }
   runApp(const MyApp());
 }
 

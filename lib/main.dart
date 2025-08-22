@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'core/constants/app_colors.dart';
+import 'core/widgets/main_scaffold.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,38 +12,19 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Transporte Futura RD',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        primaryColor: AppColors.primary,
+        scaffoldBackgroundColor: AppColors.light,
         useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Transporte Vial RD'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: const Center(
-        child: Text(
-          '¡Hola Mundo!',
-          style: TextStyle(fontSize: 32),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppColors.primary,
+          primary: AppColors.primary,
+          secondary: AppColors.secondary,
         ),
       ),
+      home: const MainScaffold(),
     );
   }
 }

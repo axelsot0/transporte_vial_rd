@@ -15,6 +15,16 @@ if (NOT DEFINED FLUTTER_TARGET_PLATFORM)
   set(FLUTTER_TARGET_PLATFORM "windows-x64")
 endif()
 
+# --- parche: define apply_standard_settings si no existe ---
+if(NOT COMMAND apply_standard_settings)
+  function(apply_standard_settings target)
+    # Lo mínimo: exigir C++17 en ese target
+    target_compile_features(${target} PUBLIC cxx_std_17)
+  endfunction()
+endif()
+# --- fin del parche ---
+
+
 # === Flutter Library ===
 set(FLUTTER_LIBRARY "${EPHEMERAL_DIR}/flutter_windows.dll")
 

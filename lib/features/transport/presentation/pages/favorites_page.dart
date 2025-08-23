@@ -34,28 +34,28 @@ class _FavoritesPageState extends State<FavoritesPage> {
 
   final List<FavoriteRoute> _favorites = [
     FavoriteRoute(
-      title: 'Línea 1: Mamá Tingó ↔ Centro de los Héroes',
+      title: 'Casa',
       transportType: 'Metro',
       schedule: 'L–S 5:30–22:30 · D 6:00–22:00',
       icon: Icons.train,
       color: AppColors.primary,
     ),
     FavoriteRoute(
-      title: 'Corredor Duarte Express',
+      title: 'Universidad',
       transportType: 'Corredor',
       schedule: '5:00–23:00 · Alta frecuencia',
       icon: Icons.directions_bus_filled,
       color: AppColors.brown,
     ),
     FavoriteRoute(
-      title: 'OMSA – Kennedy',
+      title: 'Plaza de la Bandera',
       transportType: 'OMSA',
       schedule: '5:30–22:30 · Paradas oficiales',
       icon: Icons.directions_bus,
       color: AppColors.secondary,
     ),
     FavoriteRoute(
-      title: 'Teleférico L1: Eduardo Brito ↔ Sabana Perdida',
+      title: 'Trabajo',
       transportType: 'Teleférico',
       schedule: '6:00–22:00 · Conexión Metro',
       icon: Icons.cable,

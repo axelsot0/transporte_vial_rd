@@ -1523,10 +1523,29 @@ class ProfilePage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Sofia', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.white)),
-                        Text('Ciudadana', style: TextStyle(fontSize: 16, color: AppColors.gray)),
-                        Text('1200 puntos',
-                            style: TextStyle(fontSize: 14, color: AppColors.primary, fontWeight: FontWeight.w600)),
+                        Text(
+                          'Sofia Pérez Lalane',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.white,
+                          ),
+                        ),
+                        Text(
+                          'Ciudadana',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: AppColors.gray,
+                          ),
+                        ),
+                        Text(
+                          '1200 puntos',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -1585,6 +1604,8 @@ class ProfilePage extends StatelessWidget {
                         AppColors.gray,
                         () {},
                       ),
+                      const SizedBox(height: 120),
+                      
                     ],
                   ),
                 ),
@@ -1628,3 +1649,8 @@ class ProfilePage extends StatelessWidget {
     );
   }
 }
+
+
+
+
+

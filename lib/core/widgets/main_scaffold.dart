@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:transporte_vial_rd/features/tickets/presentation/pages/purchase_ticket_page.dart';
 import 'package:transporte_vial_rd/features/transport/presentation/pages/route_details_page.dart';
 import '../constants/app_colors.dart';
 import '../../features/transport/presentation/pages/home_page.dart';
@@ -439,13 +440,13 @@ class _TicketsPageState extends State<TicketsPage> with TickerProviderStateMixin
                       ],
                     ),
                   ),
-                  // Botón agregar ticket → RouteDetailsPage
+                  // Botón agregar ticket → PurchaseTicketPage
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const RouteDetailsPage(
+                          builder: (context) => const PurchaseTicketPage(
                             routeName: "Ruta Metro SD",
                             transportType: "Metro",
                           ),

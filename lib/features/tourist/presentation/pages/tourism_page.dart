@@ -14,8 +14,11 @@ class _TourismPageState extends State<TourismPage> {
   PageController pageController = PageController();
   int currentStep = 0;
   bool isGenerating = false;
-  String? generatedTour;
-  
+
+  // Resultado en dos formatos posibles
+  String? generatedTourText; // Texto bruto (si no llega JSON)
+  Map<String, dynamic>? generatedTourJson; // JSON estructurado preferido
+
   // Respuestas del usuario
   Map<String, dynamic> userPreferences = {
     'interests': <String>[],
@@ -25,7 +28,7 @@ class _TourismPageState extends State<TourismPage> {
     'groupType': '',
   };
 
-  // API Key de OpenAI - REEMPLAZA CON TU API KEY REAL
+  /// ⚠️ Reemplaza esto por una variable segura (dotenv, secure storage, remote config, etc.)
   final String apiKey = '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'; // ⚠️ CAMBIAR ESTA LÍNEA
 
   @override
@@ -69,7 +72,7 @@ class _TourismPageState extends State<TourismPage> {
               }),
             ),
           ),
-          
+
           // Content
           Expanded(
             child: Container(
@@ -96,7 +99,8 @@ class _TourismPageState extends State<TourismPage> {
       ),
     );
   }
-  
+
+  // -------------------- PASO 1: INTERESES --------------------
   Widget _buildInterestsStep() {
     return Padding(
       padding: const EdgeInsets.all(24),
@@ -121,9 +125,7 @@ class _TourismPageState extends State<TourismPage> {
               height: 1.4,
             ),
           ),
-          
           const SizedBox(height: 32),
-          
           Expanded(
             child: GridView.count(
               crossAxisCount: 2,
@@ -140,22 +142,22 @@ class _TourismPageState extends State<TourismPage> {
               ],
             ),
           ),
-          
           const SizedBox(height: 24),
-          
           SizedBox(
             width: double.infinity,
             height: 56,
             child: ElevatedButton(
-              onPressed: userPreferences['interests'].isNotEmpty ? () {
-                setState(() {
-                  currentStep = 1;
-                });
-                pageController.nextPage(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
-                );
-              } : null,
+              onPressed: userPreferences['interests'].isNotEmpty
+                  ? () {
+                      setState(() {
+                        currentStep = 1;
+                      });
+                      pageController.nextPage(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                    }
+                  : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: AppColors.white,
@@ -177,10 +179,10 @@ class _TourismPageState extends State<TourismPage> {
       ),
     );
   }
-  
+
   Widget _buildInterestCard(String title, IconData icon, String value) {
     final isSelected = userPreferences['interests'].contains(value);
-    
+
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -238,7 +240,8 @@ class _TourismPageState extends State<TourismPage> {
       ),
     );
   }
-  
+
+  // -------------------- PASO 2: TIEMPO --------------------
   Widget _buildTimeStep() {
     return Padding(
       padding: const EdgeInsets.all(24),
@@ -263,9 +266,7 @@ class _TourismPageState extends State<TourismPage> {
               height: 1.4,
             ),
           ),
-          
           const SizedBox(height: 32),
-          
           Expanded(
             child: Column(
               children: [
@@ -279,9 +280,7 @@ class _TourismPageState extends State<TourismPage> {
               ],
             ),
           ),
-          
           const SizedBox(height: 24),
-          
           Row(
             children: [
               Expanded(
@@ -309,15 +308,17 @@ class _TourismPageState extends State<TourismPage> {
               const SizedBox(width: 16),
               Expanded(
                 child: ElevatedButton(
-                  onPressed: userPreferences['time'].isNotEmpty ? () {
-                    setState(() {
-                      currentStep = 2;
-                    });
-                    pageController.nextPage(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                    );
-                  } : null,
+                  onPressed: userPreferences['time'].isNotEmpty
+                      ? () {
+                          setState(() {
+                            currentStep = 2;
+                          });
+                          pageController.nextPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        }
+                      : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: AppColors.white,
@@ -336,10 +337,10 @@ class _TourismPageState extends State<TourismPage> {
       ),
     );
   }
-  
+
   Widget _buildTimeOption(String title, String subtitle, String value) {
     final isSelected = userPreferences['time'] == value;
-    
+
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -414,7 +415,8 @@ class _TourismPageState extends State<TourismPage> {
       ),
     );
   }
-  
+
+  // -------------------- PASO 3: RITMO --------------------
   Widget _buildPaceStep() {
     return Padding(
       padding: const EdgeInsets.all(24),
@@ -439,9 +441,7 @@ class _TourismPageState extends State<TourismPage> {
               height: 1.4,
             ),
           ),
-          
           const SizedBox(height: 32),
-          
           Expanded(
             child: Column(
               children: [
@@ -453,9 +453,7 @@ class _TourismPageState extends State<TourismPage> {
               ],
             ),
           ),
-          
           const SizedBox(height: 24),
-          
           Row(
             children: [
               Expanded(
@@ -483,15 +481,17 @@ class _TourismPageState extends State<TourismPage> {
               const SizedBox(width: 16),
               Expanded(
                 child: ElevatedButton(
-                  onPressed: userPreferences['pace'].isNotEmpty ? () {
-                    setState(() {
-                      currentStep = 3;
-                    });
-                    pageController.nextPage(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                    );
-                  } : null,
+                  onPressed: userPreferences['pace'].isNotEmpty
+                      ? () {
+                          setState(() {
+                            currentStep = 3;
+                          });
+                          pageController.nextPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        }
+                      : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: AppColors.white,
@@ -510,10 +510,10 @@ class _TourismPageState extends State<TourismPage> {
       ),
     );
   }
-  
+
   Widget _buildPaceOption(String title, String description, String value, IconData icon) {
     final isSelected = userPreferences['pace'] == value;
-    
+
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -582,16 +582,17 @@ class _TourismPageState extends State<TourismPage> {
       ),
     );
   }
-  
+
+  // -------------------- PASO 4: GENERAR --------------------
   Widget _buildGenerateStep() {
     if (isGenerating) {
       return _buildLoadingView();
     }
-    
-    if (generatedTour != null) {
+
+    if (generatedTourJson != null || generatedTourText != null) {
       return _buildTourResult();
     }
-    
+
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -665,7 +666,7 @@ class _TourismPageState extends State<TourismPage> {
       ),
     );
   }
-  
+
   Widget _buildLoadingView() {
     return Padding(
       padding: const EdgeInsets.all(24),
@@ -717,13 +718,15 @@ class _TourismPageState extends State<TourismPage> {
       ),
     );
   }
-  
+
+  // -------------------- RESULTADO --------------------
   Widget _buildTourResult() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Banner
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(20),
@@ -734,11 +737,7 @@ class _TourismPageState extends State<TourismPage> {
             ),
             child: const Row(
               children: [
-                Icon(
-                  Icons.check_circle,
-                  color: Color(0xFF4CAF50),
-                  size: 24,
-                ),
+                Icon(Icons.check_circle, color: Color(0xFF4CAF50), size: 24),
                 SizedBox(width: 12),
                 Expanded(
                   child: Text(
@@ -753,56 +752,302 @@ class _TourismPageState extends State<TourismPage> {
               ],
             ),
           ),
-          
           const SizedBox(height: 24),
-          
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
+
+          if (generatedTourJson != null) ...[
+            // Resumen
+            if ((generatedTourJson!['resumen'] ?? '').toString().trim().isNotEmpty)
+              _buildCard(
+                title: 'Resumen',
+                icon: Icons.summarize,
+                child: Text(
+                  generatedTourJson!['resumen'],
+                  style: const TextStyle(fontSize: 16, color: AppColors.dark, height: 1.5),
                 ),
-              ],
+              ),
+            const SizedBox(height: 16),
+
+            // Horarios (timeline)
+            if (generatedTourJson!['horarios'] is List && (generatedTourJson!['horarios'] as List).isNotEmpty)
+              _buildCard(
+                title: 'Horarios',
+                icon: Icons.schedule,
+                child: Column(
+                  children: (generatedTourJson!['horarios'] as List).map((h) {
+                    final hora = (h['hora'] ?? '') as String;
+                    final actividad = (h['actividad'] ?? '') as String;
+                    final lugar = (h['lugar'] ?? '') as String;
+                    final dur = (h['duracion_min'] ?? 0).toString();
+                    final detalle = (h['detalle'] ?? '') as String;
+
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Punto de timeline
+                          Column(
+                            children: [
+                              Container(
+                                width: 10,
+                                height: 10,
+                                decoration: const BoxDecoration(
+                                  color: AppColors.primary,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              Container(
+                                width: 2,
+                                height: 36,
+                                color: AppColors.gray.withOpacity(0.4),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Wrap(
+                                  spacing: 8,
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  children: [
+                                    _pill(hora),
+                                    if (dur != '0') _pill('$dur min'),
+                                  ],
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  actividad,
+                                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: AppColors.dark),
+                                ),
+                                if (lugar.isNotEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 4.0),
+                                    child: Row(
+                                      children: [
+                                        const Icon(Icons.place, size: 16, color: AppColors.brown),
+                                        const SizedBox(width: 6),
+                                        Expanded(
+                                          child: Text(
+                                            lugar,
+                                            style: const TextStyle(color: AppColors.brown, fontSize: 14),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                if (detalle.isNotEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 6.0),
+                                    child: Text(
+                                      detalle,
+                                      style: const TextStyle(fontSize: 14, color: AppColors.dark),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            const SizedBox(height: 16),
+
+            // Paradas (chips)
+            if (generatedTourJson!['paradas'] is List && (generatedTourJson!['paradas'] as List).isNotEmpty)
+              _buildCard(
+                title: 'Paradas',
+                icon: Icons.flag,
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: (generatedTourJson!['paradas'] as List).map((p) {
+                    final nombre = (p['nombre'] ?? '') as String;
+                    final tipo = (p['tipo'] ?? '') as String;
+                    return _chip(nombre.isNotEmpty ? nombre : tipo);
+                  }).toList(),
+                ),
+              ),
+            const SizedBox(height: 16),
+
+            // Lugares destacados (cards)
+            if (generatedTourJson!['lugares_destacados'] is List && (generatedTourJson!['lugares_destacados'] as List).isNotEmpty)
+              _buildCard(
+                title: 'Lugares destacados',
+                icon: Icons.star,
+                child: Column(
+                  children: (generatedTourJson!['lugares_destacados'] as List).map((l) {
+                    final nombre = (l['nombre'] ?? '') as String;
+                    final descripcion = (l['descripcion'] ?? '') as String;
+                    final precio = l['precio_est_rd'];
+                    final tiempo = l['tiempo_sugerido_min'];
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.light,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.gray.withOpacity(0.25)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(nombre, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: AppColors.dark)),
+                          if (descripcion.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 6.0),
+                              child: Text(descripcion, style: const TextStyle(fontSize: 14, color: AppColors.dark)),
+                            ),
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 8,
+                            children: [
+                              if (precio != null) _pill('RD\$${precio.toString()}'),
+                              if (tiempo != null) _pill('${tiempo.toString()} min'),
+                            ],
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            const SizedBox(height: 16),
+
+            // Transporte
+            if (generatedTourJson!['transporte'] is List && (generatedTourJson!['transporte'] as List).isNotEmpty)
+              _buildCard(
+                title: 'Transporte',
+                icon: Icons.directions_transit,
+                child: Column(
+                  children: (generatedTourJson!['transporte'] as List).map((t) {
+                    final medio = (t['medio'] ?? '') as String;
+                    final linea = (t['linea'] ?? '')?.toString() ?? '';
+                    final paradas = (t['paradas'] ?? '')?.toString() ?? '';
+                    final costo = (t['costo_rd'] ?? '')?.toString() ?? '';
+                    final notas = (t['notas'] ?? '') as String? ?? '';
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: const Icon(Icons.train, color: AppColors.primary),
+                      title: Text(
+                        medio.isNotEmpty ? medio : 'Transporte',
+                        style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.dark),
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (linea.isNotEmpty) Text('Línea: $linea'),
+                          if (paradas.isNotEmpty) Text('Paradas: $paradas'),
+                          if (costo.isNotEmpty) Text('Costo: RD\$$costo'),
+                          if (notas.isNotEmpty) Text('Notas: $notas'),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            const SizedBox(height: 16),
+
+            // Comida recomendada
+            if (generatedTourJson!['comida_recomendada'] is List && (generatedTourJson!['comida_recomendada'] as List).isNotEmpty)
+              _buildCard(
+                title: 'Comida recomendada',
+                icon: Icons.restaurant_menu,
+                child: Column(
+                  children: (generatedTourJson!['comida_recomendada'] as List).map((c) {
+                    final nombre = (c['nombre'] ?? '') as String;
+                    final lugar = (c['lugar'] ?? '') as String;
+                    final precio = c['precio_est_rd'];
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: const Icon(Icons.local_dining, color: AppColors.primary),
+                      title: Text(nombre, style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.dark)),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (lugar.isNotEmpty) Text('Lugar: $lugar'),
+                          if (precio != null) Text('Precio estimado: RD\$$precio'),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            const SizedBox(height: 16),
+
+            // Consejos
+            if (generatedTourJson!['consejos'] is List && (generatedTourJson!['consejos'] as List).isNotEmpty)
+              _buildCard(
+                title: 'Consejos',
+                icon: Icons.tips_and_updates,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: (generatedTourJson!['consejos'] as List).map((c) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 6.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('•  ', style: TextStyle(fontSize: 16)),
+                          Expanded(
+                            child: Text(c.toString(), style: const TextStyle(fontSize: 14, color: AppColors.dark)),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            const SizedBox(height: 16),
+
+            // Presupuesto
+            if (generatedTourJson!['presupuesto'] is Map && (generatedTourJson!['presupuesto'] as Map).isNotEmpty)
+              _buildCard(
+                title: 'Presupuesto estimado',
+                icon: Icons.payments,
+                child: Builder(
+                  builder: (_) {
+                    final p = generatedTourJson!['presupuesto'] as Map;
+                    final min = p['min_rd'];
+                    final max = p['max_rd'];
+                    return Row(
+                      children: [
+                        _pill('Mín: RD\$${_fmtInt(min)}'),
+                        const SizedBox(width: 8),
+                        _pill('Máx: RD\$${_fmtInt(max)}'),
+                      ],
+                    );
+                  },
+                ),
+              ),
+          ] else ...[
+            // Modo texto (fallback)
+            _buildCard(
+              title: 'Tu Itinerario Personalizado',
+              icon: Icons.map,
+              child: Text(
+                generatedTourText ?? '',
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: AppColors.dark,
+                  height: 1.5,
+                ),
+              ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Tu Itinerario Personalizado',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.dark,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  generatedTour ?? '',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: AppColors.dark,
-                    height: 1.5,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          
+          ],
+
           const SizedBox(height: 24),
-          
           Row(
             children: [
               Expanded(
                 child: OutlinedButton(
                   onPressed: () {
                     setState(() {
-                      generatedTour = null;
+                      generatedTourText = null;
+                      generatedTourJson = null;
                       currentStep = 0;
                       userPreferences = {
                         'interests': <String>[],
@@ -848,33 +1093,35 @@ class _TourismPageState extends State<TourismPage> {
               ),
             ],
           ),
-          
           const SizedBox(height: 100),
         ],
       ),
     );
   }
 
+  // -------------------- LÓGICA IA --------------------
   Future<void> _generateTour() async {
     setState(() {
       isGenerating = true;
+      generatedTourText = null;
+      generatedTourJson = null;
     });
+
     
-    // Verificar si tenemos API key válida
-    if (apiKey == 'TU_API_KEY_AQUI' || apiKey.isEmpty) {
-      print('⚠️ API key no configurada, usando fallback personalizado');
-      await Future.delayed(const Duration(seconds: 3));
+
+    // Si no hay apiKey, usar fallback
+    if (apiKey.isEmpty || apiKey == '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') {
+      await Future.delayed(const Duration(seconds: 2));
+      final fallback = _getStructuredFallback();
       setState(() {
-        generatedTour = _getPersonalizedTour();
+        generatedTourJson = fallback;
         isGenerating = false;
       });
       return;
     }
-    
+
     try {
-      String prompt = _buildPrompt();
-      print('🤖 Enviando prompt a ChatGPT: $prompt');
-      
+      final prompt = _buildPromptJSON();
       final response = await http.post(
         Uri.parse('https://api.openai.com/v1/chat/completions'),
         headers: {
@@ -882,246 +1129,350 @@ class _TourismPageState extends State<TourismPage> {
           'Authorization': 'Bearer $apiKey',
         },
         body: jsonEncode({
+          // Puedes usar 'gpt-4o-mini' si tu cuenta lo soporta; aquí se deja uno común.
           'model': 'gpt-3.5-turbo',
           'messages': [
             {
               'role': 'system',
-              'content': 'Eres un guía turístico experto de Santo Domingo, República Dominicana. Crea itinerarios detallados, prácticos y personalizados. Incluye horarios específicos, precios en pesos dominicanos (RD\$), y consejos locales útiles. Mantén un tono amigable y entusiasta.'
+              'content':
+                  'Eres un guía turístico experto de Santo Domingo, República Dominicana. Devuelve SIEMPRE un JSON válido y estricto siguiendo el esquema solicitado.'
             },
             {
               'role': 'user',
-              'content': prompt
+              'content': prompt,
             }
           ],
-          'max_tokens': 800,
-          'temperature': 0.7,
+          'max_tokens': 1200,
+          'temperature': 0.6,
         }),
       );
-      
-      print('📡 Response status: ${response.statusCode}');
-      print('📡 Response body: ${response.body}');
-      
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final tour = data['choices'][0]['message']['content'];
-        
+        final content = data['choices'][0]['message']['content'] as String? ?? '';
+
+        // Intentar parsear JSON puro; si viene con texto extra, intentar limpiar
+        final jsonString = _extractFirstJsonObject(content);
+        if (jsonString != null) {
+          final parsed = jsonDecode(jsonString) as Map<String, dynamic>;
+          setState(() {
+            generatedTourJson = parsed;
+            isGenerating = false;
+          });
+        } else {
+          // Si no pudimos obtener JSON, mostramos el texto
+          setState(() {
+            generatedTourText = '🤖 Generado por IA\n\n$content';
+            isGenerating = false;
+          });
+        }
+      } else {
+        // Fallback
+        await Future.delayed(const Duration(milliseconds: 500));
+        final fallback = _getStructuredFallback();
         setState(() {
-          generatedTour = '🤖 **Generado con IA Real** \n\n$tour';
+          generatedTourJson = fallback;
           isGenerating = false;
         });
-        print('✅ Tour generado exitosamente con ChatGPT');
-      } else {
-        print('❌ Error API: ${response.statusCode} - ${response.body}');
-        throw Exception('Error ${response.statusCode}: ${response.body}');
       }
     } catch (e) {
-      print('❌ Error al llamar ChatGPT: $e');
-      print('🔄 Usando fallback personalizado');
-      
-      // Fallback personalizado si falla la API
-      await Future.delayed(const Duration(seconds: 2));
+      // Fallback
+      await Future.delayed(const Duration(milliseconds: 500));
+      final fallback = _getStructuredFallback();
       setState(() {
-        generatedTour = _getPersonalizedTour();
+        generatedTourJson = fallback;
         isGenerating = false;
       });
     }
   }
-  
-  String _buildPrompt() {
-    String interests = userPreferences['interests'].join(', ');
-    String timeText = _getTimeText();
-    String paceText = _getPaceText();
-    
-    return '''
-Crea un itinerario turístico personalizado para Santo Domingo, República Dominicana:
 
-PREFERENCIAS:
+  /// Prompt refinado: exige JSON con secciones clave.
+  String _buildPromptJSON() {
+    final interests = userPreferences['interests'].join(', ');
+    final timeText = _getTimeText();
+    final paceText = _getPaceText();
+
+    return """
+Genera un plan de tour personalizado para Santo Domingo, República Dominicana, DEVOLVIENDO EXCLUSIVAMENTE UN JSON VÁLIDO (sin explicaciones) con el SIGUIENTE ESQUEMA EXACTO y llaves en minúsculas:
+
+{
+  "resumen": "string corto con el objetivo del tour",
+  "horarios": [
+    {
+      "hora": "HH:MM AM/PM",
+      "actividad": "string",
+      "lugar": "string",
+      "duracion_min": 0,
+      "detalle": "string"
+    }
+  ],
+  "paradas": [
+    {
+      "nombre": "string",
+      "tipo": "parada|museo|parque|restaurante|bar|tienda|otro",
+      "direccion": "string",
+      "coordenadas": {"lat": 0.0, "lng": 0.0}
+    }
+  ],
+  "lugares_destacados": [
+    {
+      "nombre": "string",
+      "descripcion": "string",
+      "precio_est_rd": 0,
+      "tiempo_sugerido_min": 0
+    }
+  ],
+  "comida_recomendada": [
+    {
+      "nombre": "string (plato o experiencia)",
+      "lugar": "string",
+      "precio_est_rd": 0
+    }
+  ],
+  "transporte": [
+    {
+      "medio": "metro|omsa|taxi|uber|a_pie|otro",
+      "linea": "string (si aplica)",
+      "paradas": "string (ej: 'Máximo Gómez -> Centro de los Héroes')",
+      "costo_rd": 0,
+      "notas": "string"
+    }
+  ],
+  "consejos": ["string", "string"],
+  "presupuesto": {"min_rd": 0, "max_rd": 0}
+}
+
+REGLAS:
+* Rellena todos los campos con valores realistas de Santo Domingo (nombres de lugares, calles, costos en RD\$).
+* Adecua cantidades y duración al tiempo disponible y ritmo.
+* No incluyas texto fuera del JSON. No uses Markdown. No uses comillas simples.
+* Si algún dato es incierto, estima de forma razonable.
+* Devuelve solo el JSON final.
+
+PREFERENCIAS DEL USUARIO:
 - Intereses: $interests
 - Tiempo disponible: $timeText
 - Ritmo preferido: $paceText
-
-REQUISITOS:
-1. Incluye lugares específicos de Santo Domingo
-2. Horarios detallados y realistas
-3. Precios en pesos dominicanos (RD\$)
-4. Opciones de transporte (Metro, OMSA, taxis)
-5. Consejos locales prácticos
-6. Comida típica dominicana
-
-Organiza el itinerario de forma clara con emojis y secciones. Sé específico con nombres de lugares, calles y precios reales.
-''';
+""";
   }
-  
+
+  // -------------------- HELPERS --------------------
   String _getTimeText() {
     switch (userPreferences['time']) {
-      case 'half-day': return '4 horas (medio día)';
-      case 'full-day': return '8 horas (día completo)';
-      case 'weekend': return '2-3 días (fin de semana)';
-      case 'flexible': return 'Tiempo flexible';
-      default: return 'No especificado';
+      case 'half-day':
+        return '4 horas (medio día)';
+      case 'full-day':
+        return '8 horas (día completo)';
+      case 'weekend':
+        return '2-3 días (fin de semana)';
+      case 'flexible':
+        return 'Tiempo flexible';
+      default:
+        return 'No especificado';
+    }
+  }
+
+  String _getPaceText() {
+    switch (userPreferences['pace']) {
+      case 'relaxed':
+        return 'Relajado - tiempo para disfrutar cada lugar';
+      case 'moderate':
+        return 'Moderado - balance entre actividades y descanso';
+      case 'fast-paced':
+        return 'Intenso - ver la mayor cantidad de lugares posible';
+      default:
+        return 'No especificado';
+    }
+  }
+
+  /// Extrae el primer objeto JSON válido contenido en un texto
+  String? _extractFirstJsonObject(String text) {
+    // Busca el primer "{" y el matching "}" más externo
+    final start = text.indexOf('{');
+    if (start == -1) return null;
+
+    int braceCount = 0;
+    for (int i = start; i < text.length; i++) {
+      if (text[i] == '{') braceCount++;
+      if (text[i] == '}') braceCount--;
+      if (braceCount == 0) {
+        return text.substring(start, i + 1);
       }
- }
- 
- String _getPaceText() {
-   switch (userPreferences['pace']) {
-     case 'relaxed': return 'Relajado - tiempo para disfrutar cada lugar';
-     case 'moderate': return 'Moderado - balance entre actividades y descanso';
-     case 'fast-paced': return 'Intenso - ver la mayor cantidad de lugares posible';
-     default: return 'No especificado';
-   }
- }
- 
- String _getPersonalizedTour() {
-   String interests = userPreferences['interests'].join(', ');
-   String time = userPreferences['time'];
-   String pace = userPreferences['pace'];
-   
-   String tour = '🎯 **Tour Personalizado con IA** \n\n';
-   
-   // Encabezado personalizado basado en tiempo
-   if (time == 'half-day') {
-     tour += '⏰ **Itinerario de Medio Día (4 horas)** \n\n';
-   } else if (time == 'full-day') {
-     tour += '⏰ **Itinerario de Día Completo (8 horas)** \n\n';
-   } else if (time == 'weekend') {
-     tour += '⏰ **Itinerario de Fin de Semana (2-3 días)** \n\n';
-   } else {
-     tour += '⏰ **Itinerario Flexible** \n\n';
-   }
-   
-   // Contenido basado en intereses seleccionados
-   if (userPreferences['interests'].contains('historical')) {
-     tour += '''**9:00 AM - Zona Colonial 🏛️**
-- **Catedral Primada de América** - Primera catedral del Nuevo Mundo
-- **Calle Las Damas** - Primera calle pavimentada de América
-- **Tiempo sugerido:** 1.5 horas
-- **Entrada:** Gratuita
+    }
+    return null;
+    }
 
-**10:30 AM - Alcázar de Colón 🏰**
-- Residencia de Diego Colón, hijo de Cristóbal Colón
-- Arquitectura colonial impresionante
-- **Entrada:** RD\$100
-- **Tiempo sugerido:** 1 hora
+  // Fallback estructurado si no hay API o falla
+  Map<String, dynamic> _getStructuredFallback() {
+    // Basado en selecciones del usuario, crea un ejemplo razonable
+    return {
+      "resumen": "Ruta curada para explorar historia, comida y puntos icónicos de Santo Domingo con traslados sencillos.",
+      "horarios": [
+        {
+          "hora": "09:00 AM",
+          "actividad": "Paseo por la Zona Colonial",
+          "lugar": "Parque Colón, Catedral Primada",
+          "duracion_min": 90,
+          "detalle": "Recorrido a pie por calles emblemáticas y fotos en la Catedral."
+        },
+        {
+          "hora": "10:45 AM",
+          "actividad": "Visita museo",
+          "lugar": "Alcázar de Colón",
+          "duracion_min": 60,
+          "detalle": "Historia colonial y vistas a la Plaza de España."
+        },
+        {
+          "hora": "12:00 PM",
+          "actividad": "Almuerzo típico",
+          "lugar": "El Conuco (o similar)",
+          "duracion_min": 75,
+          "detalle": "Mangú, chicharrón de pollo, tostones, morir soñando."
+        },
+        {
+          "hora": "02:00 PM",
+          "actividad": "Naturaleza y relajación",
+          "lugar": "Jardín Botánico Nacional",
+          "duracion_min": 90,
+          "detalle": "Trencito interno y paseo por jardines."
+        }
+      ],
+      "paradas": [
+        {
+          "nombre": "Parque Colón",
+          "tipo": "parque",
+          "direccion": "Calle El Conde, Zona Colonial",
+          "coordenadas": {"lat": 18.4721, "lng": -69.8826}
+        },
+        {
+          "nombre": "Alcázar de Colón",
+          "tipo": "museo",
+          "direccion": "Plaza de España, Zona Colonial",
+          "coordenadas": {"lat": 18.4779, "lng": -69.8839}
+        },
+        {
+          "nombre": "Jardín Botánico Nacional",
+          "tipo": "parque",
+          "direccion": "Av. República de Colombia",
+          "coordenadas": {"lat": 18.4969, "lng": -69.9587}
+        }
+      ],
+      "lugares_destacados": [
+        {
+          "nombre": "Catedral Primada de América",
+          "descripcion": "La primera catedral del Nuevo Mundo.",
+          "precio_est_rd": 0,
+          "tiempo_sugerido_min": 30
+        },
+        {
+          "nombre": "Alcázar de Colón",
+          "descripcion": "Museo en antigua residencia de Diego Colón.",
+          "precio_est_rd": 150,
+          "tiempo_sugerido_min": 60
+        }
+      ],
+      "comida_recomendada": [
+        {"nombre": "Mangú con los tres golpes", "lugar": "El Conuco", "precio_est_rd": 600},
+        {"nombre": "Sancocho dominicano", "lugar": "Casa de Tostado (alrededores)", "precio_est_rd": 450}
+      ],
+      "transporte": [
+        {
+          "medio": "a_pie",
+          "linea": "",
+          "paradas": "Zona Colonial (recorrido corto)",
+          "costo_rd": 0,
+          "notas": "Calles adoquinadas, usar calzado cómodo."
+        },
+        {
+          "medio": "taxi",
+          "linea": "",
+          "paradas": "Zona Colonial -> Jardín Botánico",
+          "costo_rd": 300,
+          "notas": "También puedes usar Uber según demanda."
+        },
+        {
+          "medio": "omsa",
+          "linea": "Rutas principales por Av. John F. Kennedy",
+          "paradas": "Paradas cercanas según ubicación",
+          "costo_rd": 25,
+          "notas": "Económico pero más lento en hora pico."
+        }
+      ],
+      "consejos": [
+        "Hidrátate y usa bloqueador solar.",
+        "Lleva efectivo: no todos aceptan tarjeta.",
+        "Evita horas pico (7–9 AM y 5–7 PM).",
+        "Pregunta por descuentos a estudiantes."
+      ],
+      "presupuesto": {"min_rd": 1200, "max_rd": 2500}
+    };
+  }
 
-''';
-   }
-   
-   if (userPreferences['interests'].contains('culture')) {
-     tour += '''**12:00 PM - Museo de las Casas Reales 🎨**
-- Historia colonial y arte dominicano
-- Tesoros arqueológicos únicos
-- **Entrada:** RD\$150
-- **Tiempo sugerido:** 1.5 horas
+  // -------------------- UI HELPERS --------------------
+  Widget _buildCard({required String title, required IconData icon, required Widget child}) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(
+          children: [
+            Icon(icon, color: AppColors.primary),
+            const SizedBox(width: 8),
+            Text(
+              title,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.dark),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        child
+      ]),
+    );
+  }
 
-''';
-   }
-   
-   if (userPreferences['interests'].contains('food')) {
-     tour += '''**1:30 PM - Almuerzo Típico Dominicano 🍽️**
-- **Restaurante recomendado:** "El Conuco" (Zona Colonial)
-- **Platos imperdibles:** Mangú, pollo guisado, tostones, yuca hervida
-- **Bebida:** Morir Soñando o Chinola
-- **Costo promedio:** RD\$800-1,200 por persona
+  Widget _pill(String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withOpacity(0.1),
+        border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600),
+      ),
+    );
+  }
 
-''';
-   }
-   
-   if (userPreferences['interests'].contains('nature')) {
-     tour += '''**3:30 PM - Jardín Botánico Nacional 🌿**
-- El más grande del Caribe (2 km²)
-- Más de 300 especies de plantas
-- Perfecto para relajarse y conectar con la naturaleza
-- **Entrada:** RD\$50
-- **Transporte interno:** Tren turístico RD\$30
+  Widget _chip(String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.light,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.gray.withOpacity(0.25)),
+      ),
+      child: Text(text, style: const TextStyle(color: AppColors.dark, fontWeight: FontWeight.w600)),
+    );
+  }
 
-''';
-   }
-   
-   if (userPreferences['interests'].contains('shopping')) {
-     tour += '''**5:00 PM - Mercado Modelo 🛍️**
-- Artesanías locales auténticas
-- Souvenirs típicos dominicanos
-- **Productos recomendados:** Ámbar, larimar, café dominicano
-- **Consejo:** Siempre regatea los precios
-
-''';
-   }
-   
-   if (userPreferences['interests'].contains('nightlife')) {
-     tour += '''**7:00 PM - Zona Rosa (Noche) 🌃**
-- Vida nocturna vibrante
-- **Bares recomendados:** Montecristo, Jet Set
-- **Música:** Merengue, bachata y salsa en vivo
-- **Costo promedio bebidas:** RD\$200-400
-
-''';
-   }
-   
-   // Sección de transporte personalizada
-   tour += '''
-**🚇 Guía de Transporte:**
-- **Metro Línea 1:** Conecta centro con principales destinos (RD\$20)
-- **OMSA:** Autobuses públicos económicos (RD\$25)
-- **Taxis/Uber:** Para distancias cortas (RD\$150-300)
-- **Caminatas:** Zona Colonial es perfecta para caminar
-
-''';
-   
-   // Personalización según ritmo elegido
-   if (pace == 'relaxed') {
-     tour += '''**⏰ Ritmo Relajado - Consejos Especiales:**
-- Tómate 30-45 minutos extra en cada lugar
-- Incluye paradas para café dominicano
-- Disfruta las vistas sin prisa
-- Siéntate en las plazas a observar la vida local
-
-''';
-   } else if (pace == 'moderate') {
-     tour += '''**⏰ Ritmo Moderado - Consejos Especiales:**
-- Balance perfecto entre ver sitios y descansar
-- Incluye tiempo para almuerzo relajado
-- Toma fotos sin apuro
-- Interactúa con locales amigables
-
-''';
-   } else if (pace == 'fast-paced') {
-     tour += '''**⏰ Ritmo Intenso - Consejos Especiales:**
-- Lleva snacks y agua para maximizar tiempo
-- Usa transporte público para moverte rápido
-- Toma fotos rápidas pero no te pierdas detalles
-- Reserva energía para todo el día
-
-''';
-   }
-   
-   // Consejos finales personalizados
-   tour += '''**💡 Consejos Personalizados:**
-- **Clima:** Lleva protector solar (SPF 30+) y sombrero
-- **Calzado:** Zapatos cómodos para caminar en adoquines
-- **Dinero:** Ten efectivo, algunos lugares no aceptan tarjetas
-- **Seguridad:** Guarda copias digitales de documentos
-- **Hidratación:** Bebe agua constantemente (clima tropical)
-
-**💰 Presupuesto Total Estimado:**
-''';
-
-   // Cálculo de presupuesto basado en selecciones
-   int minCost = 500, maxCost = 800;
-   if (userPreferences['interests'].contains('food')) {
-     minCost += 800; maxCost += 1200;
-   }
-   if (userPreferences['interests'].contains('shopping')) {
-     minCost += 1000; maxCost += 3000;
-   }
-   if (userPreferences['interests'].contains('nightlife')) {
-     minCost += 800; maxCost += 1500;
-   }
-   
-   tour += '• **RD\$${minCost.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')} - RD\$${maxCost.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}** por persona\n\n';
-   
-   tour += '''**🇩🇴 ¡Que disfrutes tu aventura en Santo Domingo!**
-La capital más antigua del Nuevo Mundo te espera con historia, cultura y sabores únicos. ¡Buen viaje! ✨''';
-   
-   return tour;
- }
+  String _fmtInt(dynamic n) {
+    if (n == null) return '0';
+    final i = (n is int) ? n : int.tryParse(n.toString()) ?? 0;
+    final s = i.toString();
+    final reg = RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))');
+    return s.replaceAllMapped(reg, (m) => '${m[1]},');
+  }
 }

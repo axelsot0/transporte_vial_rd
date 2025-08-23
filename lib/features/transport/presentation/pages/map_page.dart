@@ -58,13 +58,13 @@ class _MapPageState extends State<MapPage> {
     ),
     child: ClipRRect(
       borderRadius: BorderRadius.circular(16),
-      child: kIsWeb
-          ? const ExternalMapView(
-              url: 'https://storage.googleapis.com/maps-solutions-nevyv1dmhm/commutes/5663/commutes.html',
-            )
-          : const Center(
-              child: Text('El mapa embebido por iframe está disponible en Web'),
-            ),
+      child: ClipRRect(
+  borderRadius: BorderRadius.circular(16),
+  child: const Image(
+    image: AssetImage('assets/images/fallback_map.png'),
+    fit: BoxFit.cover,
+  ),
+),
     ),
   ),
 ),

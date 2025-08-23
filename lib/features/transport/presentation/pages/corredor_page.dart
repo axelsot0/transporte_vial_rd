@@ -166,19 +166,24 @@ class _CorredorPageState extends State<CorredorPage> {
             ),
           ),
 
-          // Filters
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row(
+          
+          SizedBox(
+            height: 40, // alto del chip
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               children: [
                 _buildFilterChip('Rutas Rápidas', true),
                 const SizedBox(width: 12),
                 _buildFilterChip('Express', false),
                 const SizedBox(width: 12),
                 _buildFilterChip('Favoritos', false),
+
+                // un pequeño padding al final para que no se corte el último chip
+                const SizedBox(width: 4),
               ],
             ),
-          ),
+            ),
 
           const SizedBox(height: 16),
 

@@ -6,6 +6,7 @@ import '../../features/transport/presentation/pages/home_page.dart';
 import '../../features/education/presentation/pages/traffic_challenges_page.dart';
 import '../../features/tourist/presentation/pages/tourism_page.dart';
 import '../../features/documentation/presentation/pages/documents_page.dart';
+import 'package:transporte_vial_rd/features/transport/presentation/pages/favorites_page.dart' as fav;
 
 class MainScaffold extends StatefulWidget {
   const MainScaffold({super.key});
@@ -154,7 +155,14 @@ class LocationPage extends StatelessWidget {
                         'Tus destinos y rutas favoritas',
                         Icons.bookmark,
                         AppColors.brown,
-                        () {},
+                        () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>  const fav.FavoritesPage(),
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -1424,7 +1432,7 @@ class _TicketsPageState extends State<TicketsPage> with TickerProviderStateMixin
             child: ElevatedButton(
               onPressed: () => Navigator.pop(context),
               style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
-              child: const Text('Cerrar'),
+              child: const Text('Cerrar', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
             ),
           ),
         ]),

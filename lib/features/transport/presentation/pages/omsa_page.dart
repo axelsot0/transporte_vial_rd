@@ -1,9 +1,115 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import 'map_page.dart';
+import 'dart:math';
 
-class OMSAPage extends StatelessWidget {
+class OMSAPage extends StatefulWidget {
   const OMSAPage({super.key});
+
+  @override
+  State<OMSAPage> createState() => _OMSAPageState();
+}
+
+class _OMSAPageState extends State<OMSAPage> {
+  final List<String> _omsaTips = [
+    "Las rutas OMSA operan de 5:00 AM a 11:30 PM según la ruta",
+    "Recuerda tener tu tarjeta OMSA recargada antes de abordar",
+    "Las horas pico son de 6:00-9:00 AM y 4:00-7:00 PM",
+    "Las paradas oficiales están señalizadas con postes azules",
+    "Da prioridad a adultos mayores y personas con discapacidad",
+    "Mantén tu pasaje o tarjeta listo para agilizar el abordaje",
+    "Consulta los horarios especiales en días festivos",
+    "Las rutas troncales tienen mayor frecuencia de paso",
+    "Verifica el destino final en el frente del autobús",
+    "Conserva tu espacio personal durante el viaje"
+  ];
+
+  bool _showTip = true;
+  late String _randomTip;
+
+  @override
+  void initState() {
+    super.initState();
+    _randomTip = _getRandomTip();
+    _showTipDialog();
+  }
+
+  String _getRandomTip() {
+    final random = Random();
+    return _omsaTips[random.nextInt(_omsaTips.length)];
+  }
+
+  void _showTipDialog() {
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (_showTip && mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: true,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              backgroundColor: AppColors.dark,
+              surfaceTintColor: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              title: const Row(
+                children: [
+                  Icon(Icons.directions_bus, color: AppColors.primary),
+                  SizedBox(width: 8),
+                  Text(
+                    'Consejo OMSA',
+                    style: TextStyle(
+                      color: AppColors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              content: Text(
+                _randomTip,
+                style: const TextStyle(
+                  color: AppColors.white,
+                  fontSize: 14,
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    setState(() {
+                      _showTip = false;
+                    });
+                  },
+                  child: const Text(
+                    'Entendido',
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    setState(() {
+                      _randomTip = _getRandomTip();
+                      _showTipDialog();
+                    });
+                  },
+                  child: const Text(
+                    'Otro consejo',
+                    style: TextStyle(
+                      color: AppColors.secondary,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +131,18 @@ class OMSAPage extends StatelessWidget {
           ),
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.directions_bus, color: AppColors.primary),
+            onPressed: () {
+              setState(() {
+                _randomTip = _getRandomTip();
+                _showTip = true;
+                _showTipDialog();
+              });
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -47,7 +165,7 @@ class OMSAPage extends StatelessWidget {
               ),
             ),
           ),
-          
+
           // Filters
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -59,9 +177,9 @@ class OMSAPage extends StatelessWidget {
               ],
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Lista de rutas OMSA
           Expanded(
             child: Container(
@@ -76,7 +194,7 @@ class OMSAPage extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 children: [
                   const SizedBox(height: 8),
-                  
+
                   // Ruta Av. Kennedy
                   _buildRouteCard(
                     context,
@@ -85,9 +203,9 @@ class OMSAPage extends StatelessWidget {
                     'Ver en Mapa',
                     Icons.directions_bus,
                   ),
-                  
+
                   const SizedBox(height: 12),
-                  
+
                   // Ruta Av. 27 de Febrero
                   _buildRouteCard(
                     context,
@@ -96,9 +214,9 @@ class OMSAPage extends StatelessWidget {
                     'Ver en Mapa',
                     Icons.directions_bus,
                   ),
-                  
+
                   const SizedBox(height: 12),
-                  
+
                   // Ruta Winston Churchill
                   _buildRouteCard(
                     context,
@@ -107,9 +225,9 @@ class OMSAPage extends StatelessWidget {
                     'Ver en Mapa',
                     Icons.directions_bus,
                   ),
-                  
+
                   const SizedBox(height: 12),
-                  
+
                   // Ruta Duarte
                   _buildRouteCard(
                     context,
@@ -118,9 +236,9 @@ class OMSAPage extends StatelessWidget {
                     'Ver en Mapa',
                     Icons.directions_bus,
                   ),
-                  
+
                   const SizedBox(height: 12),
-                  
+
                   // Ruta Mella
                   _buildRouteCard(
                     context,
@@ -129,7 +247,7 @@ class OMSAPage extends StatelessWidget {
                     'Ver en Mapa',
                     Icons.directions_bus,
                   ),
-                  
+
                   // Espacio extra para el navbar
                   const SizedBox(height: 100),
                 ],
@@ -140,7 +258,7 @@ class OMSAPage extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget _buildFilterChip(String label, bool isSelected) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -160,7 +278,7 @@ class OMSAPage extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget _buildRouteCard(BuildContext context, String title, String time, String action, IconData icon) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -189,9 +307,9 @@ class OMSAPage extends StatelessWidget {
               size: 24,
             ),
           ),
-          
+
           const SizedBox(width: 16),
-          
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -215,7 +333,7 @@ class OMSAPage extends StatelessWidget {
               ],
             ),
           ),
-          
+
           TextButton(
             onPressed: () {
               Navigator.push(

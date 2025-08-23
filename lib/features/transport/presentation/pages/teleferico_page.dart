@@ -1,9 +1,115 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import 'map_page.dart';
+import 'dart:math';
 
-class TelefericoPage extends StatelessWidget {
+class TelefericoPage extends StatefulWidget {
   const TelefericoPage({super.key});
+
+  @override
+  State<TelefericoPage> createState() => _TelefericoPageState();
+}
+
+class _TelefericoPageState extends State<TelefericoPage> {
+  final List<String> _telefericoTips = [
+    "El Teleférico opera de 6:00 AM a 10:00 PM de lunes a domingo",
+    "Utiliza la misma tarjeta del metro para viajar en el Teleférico",
+    "Disfruta de las vistas panorámicas de la ciudad durante el recorrido",
+    "Mantén la calma durante el viaje, es un transporte muy seguro",
+    "Respeta el aforo máximo de cada cabina para tu comodidad",
+    "El Teleférico conecta perfectamente con las estaciones del metro",
+    "Viaja ligero para mayor comodidad en las cabinas",
+    "Aprovecha el sistema integrado de transporte con un solo pasaje",
+    "En días lluviosos, el servicio puede operar con precaución",
+    "Las cabinas están equipadas con sistemas de seguridad avanzados"
+  ];
+
+  bool _showTip = true;
+  late String _randomTip;
+
+  @override
+  void initState() {
+    super.initState();
+    _randomTip = _getRandomTip();
+    _showTipDialog();
+  }
+
+  String _getRandomTip() {
+    final random = Random();
+    return _telefericoTips[random.nextInt(_telefericoTips.length)];
+  }
+
+  void _showTipDialog() {
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (_showTip && mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: true,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              backgroundColor: AppColors.dark,
+              surfaceTintColor: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              title: const Row(
+                children: [
+                  Icon(Icons.cable, color: Color(0xFF4CAF50)),
+                  SizedBox(width: 8),
+                  Text(
+                    'Consejo Teleférico',
+                    style: TextStyle(
+                      color: AppColors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              content: Text(
+                _randomTip,
+                style: const TextStyle(
+                  color: AppColors.white,
+                  fontSize: 14,
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    setState(() {
+                      _showTip = false;
+                    });
+                  },
+                  child: const Text(
+                    'Entendido',
+                    style: TextStyle(
+                      color: Color(0xFF4CAF50),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    setState(() {
+                      _randomTip = _getRandomTip();
+                      _showTipDialog();
+                    });
+                  },
+                  child: const Text(
+                    'Otro consejo',
+                    style: TextStyle(
+                      color: AppColors.secondary,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +131,18 @@ class TelefericoPage extends StatelessWidget {
           ),
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.cable, color: Color(0xFF4CAF50)),
+            onPressed: () {
+              setState(() {
+                _randomTip = _getRandomTip();
+                _showTip = true;
+                _showTipDialog();
+              });
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -47,7 +165,7 @@ class TelefericoPage extends StatelessWidget {
               ),
             ),
           ),
-          
+
           // Filters
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -59,9 +177,9 @@ class TelefericoPage extends StatelessWidget {
               ],
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Lista de rutas Teleférico
           Expanded(
             child: Container(
@@ -76,7 +194,7 @@ class TelefericoPage extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 children: [
                   const SizedBox(height: 8),
-                  
+
                   // Ruta Completa
                   _buildRouteCard(
                     context,
@@ -85,9 +203,9 @@ class TelefericoPage extends StatelessWidget {
                     'Ver en Mapa',
                     Icons.cable,
                   ),
-                  
+
                   const SizedBox(height: 12),
-                  
+
                   // Estación Máximo Gómez
                   _buildRouteCard(
                     context,
@@ -96,9 +214,9 @@ class TelefericoPage extends StatelessWidget {
                     'Ver en Mapa',
                     Icons.location_on,
                   ),
-                  
+
                   const SizedBox(height: 12),
-                  
+
                   // Estación Sabana Perdida
                   _buildRouteCard(
                     context,
@@ -107,9 +225,9 @@ class TelefericoPage extends StatelessWidget {
                     'Ver en Mapa',
                     Icons.location_on,
                   ),
-                  
+
                   const SizedBox(height: 12),
-                  
+
                   // Estación Villa Mella
                   _buildRouteCard(
                     context,
@@ -118,7 +236,7 @@ class TelefericoPage extends StatelessWidget {
                     'Ver en Mapa',
                     Icons.location_on,
                   ),
-                  
+
                   // Espacio extra para el navbar
                   const SizedBox(height: 100),
                 ],
@@ -129,7 +247,7 @@ class TelefericoPage extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget _buildFilterChip(String label, bool isSelected) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -149,7 +267,7 @@ class TelefericoPage extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget _buildRouteCard(BuildContext context, String title, String time, String action, IconData icon) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -178,9 +296,9 @@ class TelefericoPage extends StatelessWidget {
               size: 24,
             ),
           ),
-          
+
           const SizedBox(width: 16),
-          
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -204,7 +322,7 @@ class TelefericoPage extends StatelessWidget {
               ],
             ),
           ),
-          
+
           TextButton(
             onPressed: () {
               Navigator.push(

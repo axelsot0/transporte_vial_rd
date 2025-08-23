@@ -1,9 +1,115 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import 'map_page.dart';
+import 'dart:math';
 
-class CorredorPage extends StatelessWidget {
+class CorredorPage extends StatefulWidget {
   const CorredorPage({super.key});
+
+  @override
+  State<CorredorPage> createState() => _CorredorPageState();
+}
+
+class _CorredorPageState extends State<CorredorPage> {
+  final List<String> _corredorTips = [
+    "Los corredores express tienen paradas limitadas para mayor rapidez",
+    "Verifica los horarios de los corredores ya que varían por ruta",
+    "Los corredores suelen tener mayor frecuencia en horas pico",
+    "Mantén tu tarjeta de transporte lista para un abordaje rápido",
+    "Los corredores tienen carriles exclusivos para evitar tráfico",
+    "Identifica las paradas oficiales de los corredores express",
+    "Aprovecha la velocidad de los corredores para trayectos largos",
+    "Los corredores suelen tener unidades más modernas y cómodas",
+    "Consulta las rutas integradas con metro y teleférico",
+    "Respeta las filas en las paradas para un abordaje ordenado"
+  ];
+
+  bool _showTip = true;
+  late String _randomTip;
+
+  @override
+  void initState() {
+    super.initState();
+    _randomTip = _getRandomTip();
+    _showTipDialog();
+  }
+
+  String _getRandomTip() {
+    final random = Random();
+    return _corredorTips[random.nextInt(_corredorTips.length)];
+  }
+
+  void _showTipDialog() {
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (_showTip && mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: true,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              backgroundColor: AppColors.dark,
+              surfaceTintColor: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              title: const Row(
+                children: [
+                  Icon(Icons.directions_bus_filled, color: AppColors.brown),
+                  SizedBox(width: 8),
+                  Text(
+                    'Consejo Corredor',
+                    style: TextStyle(
+                      color: AppColors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              content: Text(
+                _randomTip,
+                style: const TextStyle(
+                  color: AppColors.white,
+                  fontSize: 14,
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    setState(() {
+                      _showTip = false;
+                    });
+                  },
+                  child: const Text(
+                    'Entendido',
+                    style: TextStyle(
+                      color: AppColors.brown,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    setState(() {
+                      _randomTip = _getRandomTip();
+                      _showTipDialog();
+                    });
+                  },
+                  child: const Text(
+                    'Otro consejo',
+                    style: TextStyle(
+                      color: AppColors.secondary,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +131,18 @@ class CorredorPage extends StatelessWidget {
           ),
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.directions_bus_filled, color: AppColors.brown),
+            onPressed: () {
+              setState(() {
+                _randomTip = _getRandomTip();
+                _showTip = true;
+                _showTipDialog();
+              });
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -47,7 +165,7 @@ class CorredorPage extends StatelessWidget {
               ),
             ),
           ),
-          
+
           // Filters
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -59,9 +177,9 @@ class CorredorPage extends StatelessWidget {
               ],
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Lista de rutas Corredor
           Expanded(
             child: Container(
@@ -76,7 +194,7 @@ class CorredorPage extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 children: [
                   const SizedBox(height: 8),
-                  
+
                   // Corredor Duarte
                   _buildRouteCard(
                     context,
@@ -85,9 +203,9 @@ class CorredorPage extends StatelessWidget {
                     'Ver en Mapa',
                     Icons.directions_bus_filled,
                   ),
-                  
+
                   const SizedBox(height: 12),
-                  
+
                   // Corredor Kennedy
                   _buildRouteCard(
                     context,
@@ -96,9 +214,9 @@ class CorredorPage extends StatelessWidget {
                     'Ver en Mapa',
                     Icons.directions_bus_filled,
                   ),
-                  
+
                   const SizedBox(height: 12),
-                  
+
                   // Corredor Isabela
                   _buildRouteCard(
                     context,
@@ -107,9 +225,9 @@ class CorredorPage extends StatelessWidget {
                     'Ver en Mapa',
                     Icons.directions_bus_filled,
                   ),
-                  
+
                   const SizedBox(height: 12),
-                  
+
                   // Corredor Las Américas
                   _buildRouteCard(
                     context,
@@ -118,7 +236,7 @@ class CorredorPage extends StatelessWidget {
                     'Ver en Mapa',
                     Icons.directions_bus_filled,
                   ),
-                  
+
                   // Espacio extra para el navbar
                   const SizedBox(height: 100),
                 ],
@@ -129,7 +247,7 @@ class CorredorPage extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget _buildFilterChip(String label, bool isSelected) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -149,7 +267,7 @@ class CorredorPage extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget _buildRouteCard(BuildContext context, String title, String time, String action, IconData icon) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -178,9 +296,9 @@ class CorredorPage extends StatelessWidget {
               size: 24,
             ),
           ),
-          
+
           const SizedBox(width: 16),
-          
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -204,7 +322,7 @@ class CorredorPage extends StatelessWidget {
               ],
             ),
           ),
-          
+
           TextButton(
             onPressed: () {
               Navigator.push(

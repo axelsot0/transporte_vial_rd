@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:transporte_vial_rd/features/transport/presentation/pages/route_details_page.dart';
 import 'package:transporte_vial_rd/features/transport/presentation/pages/favorites_page.dart';
 import '../constants/app_colors.dart';
 import '../../features/transport/presentation/pages/home_page.dart';
-import '../../features/education/presentation/pages/traffic_challenges_page.dart'; // Agregar esta línea
-import '../../features/tourist/presentation/pages/tourism_page.dart'; // Agregar esta línea
-import '../../features/documentation/presentation/pages/documents_page.dart'; // Agregar esta línea
+import '../../features/education/presentation/pages/traffic_challenges_page.dart';
+import '../../features/tourist/presentation/pages/tourism_page.dart';
+import '../../features/documentation/presentation/pages/documents_page.dart';
 
 class MainScaffold extends StatefulWidget {
   const MainScaffold({super.key});
@@ -26,14 +27,12 @@ class _MainScaffoldState extends State<MainScaffold> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.dark, // 1) Fondo del Scaffold oscuro
-      extendBody: true, // opcional: el body puede extenderse bajo el nav
+      backgroundColor: AppColors.dark,
+      extendBody: true,
       body: _pages[_selectedIndex],
       bottomNavigationBar: SafeArea(
-        // 3) Maneja el área segura inferior
         top: false,
         child: ClipRRect(
-          // 2) Recorta verdaderamente las esquinas
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(24),
             topRight: Radius.circular(24),
@@ -59,11 +58,7 @@ class _MainScaffoldState extends State<MainScaffold> {
   Widget _buildNavItem(IconData icon, int index, String label) {
     final isSelected = _selectedIndex == index;
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedIndex = index;
-        });
-      },
+      onTap: () => setState(() => _selectedIndex = index),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
@@ -80,7 +75,8 @@ class _MainScaffoldState extends State<MainScaffold> {
   }
 }
 
-// Páginas temporales hasta que las creemos
+// ---------------- Location (sin cambios funcionales mayores) ----------------
+
 class LocationPage extends StatelessWidget {
   const LocationPage({super.key});
   @override
@@ -122,7 +118,6 @@ class LocationPage extends StatelessWidget {
                   child: ListView(
                     padding: const EdgeInsets.all(24),
                     children: [
-                      // Planificar tour con IA
                       _buildFeatureCard(
                         context,
                         'Planificar Tour con IA',
@@ -138,10 +133,7 @@ class LocationPage extends StatelessWidget {
                           );
                         },
                       ),
-
                       const SizedBox(height: 16),
-
-                      // Mapa público
                       _buildFeatureCard(
                         context,
                         'Mapa de Transporte',
@@ -149,13 +141,13 @@ class LocationPage extends StatelessWidget {
                         Icons.map,
                         AppColors.secondary,
                         () {
-                          print('Mapa público pressed');
+                          // Integración futura de mapa
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Mapa de transporte próximamente.')),
+                          );
                         },
                       ),
-
                       const SizedBox(height: 16),
-
-                      // Lugares favoritos
                       _buildFeatureCard(
                         context,
                         'Lugares Guardados',
@@ -207,11 +199,7 @@ class LocationPage extends StatelessWidget {
                 color: color.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(
-                icon,
-                color: color,
-                size: 32,
-              ),
+              child: Icon(icon, color: color, size: 32),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -238,17 +226,39 @@ class LocationPage extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(
-              Icons.arrow_forward_ios,
-              color: AppColors.gray,
-              size: 16,
-            ),
+            const Icon(Icons.arrow_forward_ios, color: AppColors.gray, size: 16),
           ],
         ),
       ),
     );
   }
 }
+
+// ----------------------- Modelo simple para Tickets -----------------------
+
+class Ticket {
+  final String id;
+  final String transport; // Metro/OMSA/Teleférico/Corredor
+  final String route;
+  final DateTime date;
+  final double priceRD;
+  final TicketState state; // activo, usado, sinUsar (para reportes)
+  final bool hasQR;
+
+  Ticket({
+    required this.id,
+    required this.transport,
+    required this.route,
+    required this.date,
+    required this.priceRD,
+    required this.state,
+    this.hasQR = true,
+  });
+}
+
+enum TicketState { activo, usado, sinUsar }
+
+// ----------------------------- Tickets Page -----------------------------
 
 class TicketsPage extends StatefulWidget {
   const TicketsPage({super.key});
@@ -257,95 +267,282 @@ class TicketsPage extends StatefulWidget {
   State<TicketsPage> createState() => _TicketsPageState();
 }
 
-class _TicketsPageState extends State<TicketsPage>
-    with TickerProviderStateMixin {
+class _TicketsPageState extends State<TicketsPage> with TickerProviderStateMixin {
   late TabController _tabController;
 
+  // Saldo y funcionalidades (c y d)
+  double walletBalanceRD = 150.0;
+
+  // Mock de tickets
+  final List<Ticket> _tickets = [
+    Ticket(
+      id: '#TK001829',
+      transport: 'Metro',
+      route: 'L1: Centro - Mamá Tingó',
+      date: DateTime(2025, 7, 25, 17, 30),
+      priceRD: 25.0,
+      state: TicketState.activo,
+    ),
+    Ticket(
+      id: '#TK001830',
+      transport: 'OMSA',
+      route: 'Kennedy - Churchill',
+      date: DateTime(2025, 7, 25, 9, 10),
+      priceRD: 25.0,
+      state: TicketState.activo,
+    ),
+    Ticket(
+      id: '#TK001831',
+      transport: 'Teleférico',
+      route: 'Villa Mella - Centro',
+      date: DateTime(2025, 7, 26, 14, 05),
+      priceRD: 30.0,
+      state: TicketState.activo,
+    ),
+    Ticket(
+      id: '#TK001832',
+      transport: 'Corredor',
+      route: 'Núñez de Cáceres',
+      date: DateTime(2025, 7, 26, 10, 45),
+      priceRD: 30.0,
+      state: TicketState.activo,
+    ),
+    // Usados
+    Ticket(
+      id: '#TK001828',
+      transport: 'Metro',
+      route: 'Mamá Tingó - Centro',
+      date: DateTime(2025, 7, 24, 14, 30),
+      priceRD: 25.0,
+      state: TicketState.usado,
+      hasQR: false,
+    ),
+    Ticket(
+      id: '#TK001827',
+      transport: 'OMSA',
+      route: 'Plaza - Kennedy',
+      date: DateTime(2025, 7, 24, 10, 15),
+      priceRD: 25.0,
+      state: TicketState.usado,
+      hasQR: false,
+    ),
+    Ticket(
+      id: '#TK001826',
+      transport: 'Corredor',
+      route: 'Villa Mella - Centro',
+      date: DateTime(2025, 7, 23, 8, 45),
+      priceRD: 30.0,
+      state: TicketState.usado,
+      hasQR: false,
+    ),
+    Ticket(
+      id: '#TK001825',
+      transport: 'Metro',
+      route: 'Centro - Villa Mella',
+      date: DateTime(2025, 7, 23, 18, 20),
+      priceRD: 25.0,
+      state: TicketState.usado,
+      hasQR: false,
+    ),
+    // Sin usar (para dashboard)
+    Ticket(
+      id: '#TK001824',
+      transport: 'OMSA',
+      route: '27 de Febrero – Máximo Gómez',
+      date: DateTime(2025, 7, 28, 9, 20),
+      priceRD: 25.0,
+      state: TicketState.sinUsar,
+    ),
+  ];
+
+  // Filtros (b) y (e)
+  String transportFilter = 'Todos'; // Todos/Metro/OMSA/Teleférico/Corredor
+  String routeFilterQuery = '';
+  final TextEditingController _routeSearchCtrl = TextEditingController();
+
+  // Tabs: Activos, Usados, Dashboard
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
+    _routeSearchCtrl.addListener(() {
+      setState(() {
+        routeFilterQuery = _routeSearchCtrl.text.trim().toLowerCase();
+      });
+    });
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    _routeSearchCtrl.dispose();
     super.dispose();
   }
 
+  List<Ticket> _applyFilters(List<Ticket> input, {TicketState? onlyState}) {
+    return input.where((t) {
+      final byState = onlyState == null ? true : t.state == onlyState;
+      final byTransport = transportFilter == 'Todos' ? true : t.transport == transportFilter;
+      final byRoute = routeFilterQuery.isEmpty
+          ? true
+          : (t.route.toLowerCase().contains(routeFilterQuery) || t.id.toLowerCase().contains(routeFilterQuery));
+      return byState && byTransport && byRoute;
+    }).toList();
+  }
+
+  // ----------------------- UI principal -----------------------
+
   @override
   Widget build(BuildContext context) {
+    final activos = _applyFilters(_tickets, onlyState: TicketState.activo);
+    final usados = _applyFilters(_tickets, onlyState: TicketState.usado);
+    final sinUsar = _applyFilters(_tickets, onlyState: TicketState.sinUsar); // para dashboard
+
     return Scaffold(
       backgroundColor: AppColors.dark,
       body: SafeArea(
         child: Column(
           children: [
-            // Header personalizado
+            // Header
             Padding(
               padding: const EdgeInsets.all(24),
               child: Row(
                 children: [
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Mis Tickets',
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.white,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Mis Tickets',
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.white,
+                          ),
                         ),
-                      ),
-                      Text(
-                        'Gestiona tus viajes',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: AppColors.gray,
+                        const Text(
+                          'Gestiona tus viajes',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: AppColors.gray,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const Spacer(),
-                  // Botón agregar ticket
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(12),
+                        const SizedBox(height: 8),
+                        // Saldo y acciones rápidas (c, d)
+                        Row(
+                          children: [
+                            _pill('Saldo: ${_fmtRD(walletBalanceRD)}'),
+                            const SizedBox(width: 8),
+                            GestureDetector(
+                              onTap: _openTopUpSheet,
+                              child: _miniBtn(icon: Icons.add_card, label: 'Recargar'),
+                            ),
+                            const SizedBox(width: 8),
+                            GestureDetector(
+                              onTap: _openTapToPay,
+                              child: _miniBtn(icon: Icons.nfc, label: 'Pasar'),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                    child: const Icon(
-                      Icons.add,
-                      color: AppColors.white,
-                      size: 24,
+                  ),
+                  // Botón agregar ticket → RouteDetailsPage
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const RouteDetailsPage(
+                            routeName: "Ruta Metro SD",
+                            transportType: "Metro",
+                          ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(Icons.add, color: AppColors.white, size: 24),
                     ),
                   ),
                 ],
               ),
             ),
 
-            // Estadísticas rápidas
+            // Filtros (b): transporte + ruta
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                children: [
+                  // Chips transporte
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        _transportChip('Todos'),
+                        const SizedBox(width: 8),
+                        _transportChip('Metro'),
+                        const SizedBox(width: 8),
+                        _transportChip('OMSA'),
+                        const SizedBox(width: 8),
+                        _transportChip('Teleférico'),
+                        const SizedBox(width: 8),
+                        _transportChip('Corredor'),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  // Buscador por ruta
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.gray.withOpacity(0.3)),
+                    ),
+                    child: TextField(
+                      controller: _routeSearchCtrl,
+                      decoration: const InputDecoration(
+                        hintText: 'Filtrar por ruta o ticket (#)...',
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        prefixIcon: Icon(Icons.search),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Estadísticas rápidas (se afectan por filtros)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Row(
                 children: [
-                  Expanded(
-                      child: _buildStatCard('8', 'Activos', AppColors.primary,
-                          Icons.confirmation_number)),
+                  Expanded(child: _buildStatCard('${activos.length}', 'Activos', AppColors.primary, Icons.confirmation_number)),
+                  const SizedBox(width: 12),
+                  Expanded(child: _buildStatCard('${usados.length}', 'Usados', const Color(0xFF4CAF50), Icons.check_circle)),
                   const SizedBox(width: 12),
                   Expanded(
-                      child: _buildStatCard('15', 'Usados',
-                          const Color(0xFF4CAF50), Icons.check_circle)),
-                  const SizedBox(width: 12),
-                  Expanded(
-                      child: _buildStatCard('RD\$575', 'Total',
-                          AppColors.secondary, Icons.account_balance_wallet)),
+                    child: _buildStatCard(
+                      _fmtRD(_sumRD(_applyFilters(_tickets))),
+                      'Total',
+                      AppColors.secondary,
+                      Icons.account_balance_wallet,
+                    ),
+                  ),
                 ],
               ),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
 
-            // Contenido principal con tabs
+            // Tabs
             Expanded(
               child: Container(
                 decoration: const BoxDecoration(
@@ -357,7 +554,6 @@ class _TicketsPageState extends State<TicketsPage>
                 ),
                 child: Column(
                   children: [
-                    // Tab bar
                     Container(
                       decoration: const BoxDecoration(
                         color: AppColors.white,
@@ -380,18 +576,18 @@ class _TicketsPageState extends State<TicketsPage>
                           Tab(text: 'Activos'),
                           Tab(text: 'Usados'),
                           Tab(text: 'Historial'),
+                          Tab(text: 'Dashboard'),
                         ],
                       ),
                     ),
-
-                    // Tab content
                     Expanded(
                       child: TabBarView(
                         controller: _tabController,
                         children: [
-                          _buildActiveTickets(),
-                          _buildUsedTickets(),
-                          _buildHistoryTickets(),
+                          _buildTicketsList(_applyFilters(_tickets, onlyState: TicketState.activo), showActions: true),
+                          _buildTicketsList(_applyFilters(_tickets, onlyState: TicketState.usado)),
+                          _buildHistorySection(),
+                          _buildDashboard(activos: activos, usados: usados, sinUsar: sinUsar),
                         ],
                       ),
                     ),
@@ -405,8 +601,87 @@ class _TicketsPageState extends State<TicketsPage>
     );
   }
 
-  Widget _buildStatCard(
-      String value, String label, Color color, IconData icon) {
+  // ------------------------ Widgets de soporte Tickets ------------------------
+
+  Widget _pill(String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: AppColors.white,
+          fontWeight: FontWeight.w600,
+          fontSize: 12,
+        ),
+      ),
+    );
+  }
+
+  Widget _miniBtn({required IconData icon, required String label}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.white.withOpacity(0.1),
+        border: Border.all(color: AppColors.gray.withOpacity(0.2)),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: AppColors.white, size: 16),
+          const SizedBox(width: 6),
+          Text(label, style: const TextStyle(color: AppColors.white, fontSize: 12)),
+        ],
+      ),
+    );
+  }
+
+  Widget _transportChip(String label) {
+    final sel = transportFilter == label;
+    return GestureDetector(
+      onTap: () => setState(() => transportFilter = label),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: sel ? AppColors.primary : AppColors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: sel ? AppColors.primary : AppColors.gray.withOpacity(0.4)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              label == 'Todos'
+                  ? Icons.select_all
+                  : label == 'Metro'
+                      ? Icons.train
+                      : label == 'OMSA'
+                          ? Icons.directions_bus
+                          : label == 'Teleférico'
+                              ? Icons.tram
+                              : Icons.directions_transit,
+              size: 16,
+              color: sel ? AppColors.white : AppColors.dark,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                color: sel ? AppColors.white : AppColors.dark,
+                fontWeight: FontWeight.w600,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatCard(String value, String label, Color color, IconData icon) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -418,290 +693,54 @@ class _TicketsPageState extends State<TicketsPage>
         children: [
           Icon(icon, color: color, size: 24),
           const SizedBox(height: 8),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: color.withOpacity(0.7),
-            ),
-          ),
+          Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color)),
+          Text(label, style: TextStyle(fontSize: 12, color: color.withOpacity(0.7))),
         ],
       ),
     );
   }
 
-  Widget _buildActiveTickets() {
-    return ListView(
+  double _sumRD(List<Ticket> list) => list.fold(0.0, (a, b) => a + b.priceRD);
+
+  Widget _buildTicketsList(List<Ticket> list, {bool showActions = false}) {
+    if (list.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text(
+            'No hay tickets para los filtros seleccionados.',
+            style: TextStyle(color: AppColors.brown.withOpacity(0.9)),
+          ),
+        ),
+      );
+    }
+
+    return ListView.builder(
       padding: const EdgeInsets.all(24),
-      children: [
-        // Mensaje informativo
-        Container(
-          padding: const EdgeInsets.all(16),
-          margin: const EdgeInsets.only(bottom: 20),
-          decoration: BoxDecoration(
-            color: const Color(0xFF4CAF50).withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFF4CAF50).withOpacity(0.3)),
-          ),
-          child: const Row(
-            children: [
-              Icon(Icons.info, color: Color(0xFF4CAF50), size: 20),
-              SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  'Tickets listos para usar. Muestra el QR al conductor.',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF4CAF50),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        // Tickets activos
-        _buildTicketCard(
-          '#TK001829',
-          'Metro - Línea 1',
-          'Centro - Mama Tingó',
-          'Válido hasta: 25 Jul 2025',
-          'RD\$25.00',
-          'ACTIVO',
-          AppColors.primary,
-          true,
-        ),
-
-        _buildTicketCard(
-          '#TK001830',
-          'OMSA - Ruta Principal',
-          'Kennedy - Churchill',
-          'Válido hasta: 25 Jul 2025',
-          'RD\$25.00',
-          'ACTIVO',
-          AppColors.primary,
-          true,
-        ),
-
-        _buildTicketCard(
-          '#TK001831',
-          'Teleférico',
-          'Villa Mella - Centro',
-          'Válido hasta: 26 Jul 2025',
-          'RD\$30.00',
-          'ACTIVO',
-          AppColors.primary,
-          true,
-        ),
-
-        _buildTicketCard(
-          '#TK001832',
-          'Metro - Línea 2',
-          'Santiago Centro',
-          'Válido hasta: 26 Jul 2025',
-          'RD\$25.00',
-          'ACTIVO',
-          AppColors.primary,
-          true,
-        ),
-      ],
+      itemCount: list.length,
+      itemBuilder: (_, i) {
+        final t = list[i];
+        final status = t.state == TicketState.activo ? 'ACTIVO' : 'USADO';
+        final statusColor = t.state == TicketState.activo ? AppColors.primary : const Color(0xFF4CAF50);
+        return _ticketCard(
+          ticket: t,
+          status: status,
+          statusColor: statusColor,
+          showActions: showActions && t.state == TicketState.activo,
+        );
+      },
     );
   }
 
-  Widget _buildUsedTickets() {
-    return ListView(
-      padding: const EdgeInsets.all(24),
-      children: [
-        // Tickets usados recientes
-        _buildTicketCard(
-          '#TK001828',
-          'Metro - Línea 1',
-          'Mama Tingó - Centro',
-          'Usado: 24 Jul 2025, 2:30 PM',
-          'RD\$25.00',
-          'USADO',
-          const Color(0xFF4CAF50),
-          false,
-        ),
-
-        _buildTicketCard(
-          '#TK001827',
-          'OMSA - Ruta Kennedy',
-          'Plaza de la Cultura - Kennedy',
-          'Usado: 24 Jul 2025, 10:15 AM',
-          'RD\$25.00',
-          'USADO',
-          const Color(0xFF4CAF50),
-          false,
-        ),
-
-        _buildTicketCard(
-          '#TK001826',
-          'Corredor - Duarte',
-          'Villa Mella - Centro',
-          'Usado: 23 Jul 2025, 8:45 AM',
-          'RD\$30.00',
-          'USADO',
-          const Color(0xFF4CAF50),
-          false,
-        ),
-
-        _buildTicketCard(
-          '#TK001825',
-          'Metro - Línea 1',
-          'Centro - Villa Mella',
-          'Usado: 23 Jul 2025, 6:20 PM',
-          'RD\$25.00',
-          'USADO',
-          const Color(0xFF4CAF50),
-          false,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildHistoryTickets() {
-    return ListView(
-      padding: const EdgeInsets.all(24),
-      children: [
-        // Resumen del mes
-        Container(
-          padding: const EdgeInsets.all(20),
-          margin: const EdgeInsets.only(bottom: 20),
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'julio 2025',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.dark,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(child: _buildHistoryStat('23', 'Viajes')),
-                  Expanded(child: _buildHistoryStat('RD\$575', 'Gastado')),
-                  Expanded(child: _buildHistoryStat('Metro', 'Favorito')),
-                ],
-              ),
-            ],
-          ),
-        ),
-
-        // Historial por fechas
-        _buildDateSection('Hoy - 24 Jul'),
-        _buildTicketCard(
-          '#TK001828',
-          'Metro - Línea 1',
-          'Mama Tingó - Centro',
-          '2:30 PM',
-          'RD\$25.00',
-          'USADO',
-          const Color(0xFF4CAF50),
-          false,
-        ),
-
-        const SizedBox(height: 16),
-        _buildDateSection('Ayer - 23 Jul'),
-        _buildTicketCard(
-          '#TK001827',
-          'OMSA - Ruta Kennedy',
-          'Plaza - Kennedy',
-          '10:15 AM',
-          'RD\$25.00',
-          'USADO',
-          const Color(0xFF4CAF50),
-          false,
-        ),
-        _buildTicketCard(
-          '#TK001826',
-          'Corredor - Duarte',
-          'Villa Mella - Centro',
-          '8:45 AM',
-          'RD\$30.00',
-          'USADO',
-          const Color(0xFF4CAF50),
-          false,
-        ),
-
-        const SizedBox(height: 16),
-        _buildDateSection('22 Jul 2025'),
-        _buildTicketCard(
-          '#TK001825',
-          'Metro - Línea 1',
-          'Centro - Villa Mella',
-          '6:20 PM',
-          'RD\$25.00',
-          'USADO',
-          const Color(0xFF4CAF50),
-          false,
-        ),
-
-        // Botón ver más
-        const SizedBox(height: 20),
-        Center(
-          child: OutlinedButton(
-            onPressed: () {
-              _showFullHistory();
-            },
-            style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.primary,
-              side: const BorderSide(color: AppColors.primary),
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: const Text(
-              'Ver Historial Completo',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTicketCard(
-      String ticketId,
-      String transport,
-      String route,
-      String dateTime,
-      String price,
-      String status,
-      Color statusColor,
-      bool isActive) {
+  Widget _ticketCard({
+    required Ticket ticket,
+    required String status,
+    required Color statusColor,
+    required bool showActions,
+  }) {
     return GestureDetector(
       onTap: () {
-        if (isActive) {
-          _showTicketDetails(ticketId, transport, route, price);
-        }
+        if (showActions) _showTicketDetails(ticket);
       },
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -710,10 +749,8 @@ class _TicketsPageState extends State<TicketsPage>
           color: AppColors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isActive
-                ? statusColor.withOpacity(0.3)
-                : AppColors.gray.withOpacity(0.2),
-            width: isActive ? 2 : 1,
+            color: showActions ? statusColor.withOpacity(0.3) : AppColors.gray.withOpacity(0.2),
+            width: showActions ? 2 : 1,
           ),
           boxShadow: [
             BoxShadow(
@@ -727,148 +764,74 @@ class _TicketsPageState extends State<TicketsPage>
           children: [
             Row(
               children: [
-                // Icono de transporte
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: statusColor.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(
-                    _getTransportIcon(transport),
-                    color: statusColor,
-                    size: 24,
-                  ),
+                  child: Icon(_getTransportIcon(ticket.transport), color: statusColor, size: 24),
                 ),
-
                 const SizedBox(width: 16),
-
-                // Información del ticket
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
-                          Text(
-                            ticketId,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.dark,
-                            ),
-                          ),
+                          Text(ticket.id,
+                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.dark)),
                           const Spacer(),
                           Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 2),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
                               color: statusColor.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
                               status,
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: statusColor,
-                              ),
+                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: statusColor),
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        transport,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.dark,
-                        ),
+                        '${ticket.transport} – ${ticket.route}',
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.dark),
                       ),
+                      const SizedBox(height: 2),
                       Text(
-                        route,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: AppColors.brown,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        dateTime,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppColors.gray.withOpacity(0.8),
-                        ),
+                        _fmtDate(ticket.date),
+                        style: TextStyle(fontSize: 12, color: AppColors.gray.withOpacity(0.8)),
                       ),
                     ],
                   ),
                 ),
-
-                // Precio
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(
-                      price,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.dark,
-                      ),
-                    ),
-                    if (isActive) ...[
+                    Text(_fmtRD(ticket.priceRD),
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.dark)),
+                    if (showActions && ticket.hasQR) ...[
                       const SizedBox(height: 4),
-                      Icon(
-                        Icons.qr_code,
-                        color: statusColor,
-                        size: 20,
-                      ),
+                      const Icon(Icons.qr_code, color: AppColors.primary, size: 20),
                     ],
                   ],
                 ),
               ],
             ),
-
-            // Acciones para tickets activos
-            if (isActive) ...[
+            if (showActions) ...[
               const SizedBox(height: 12),
               const Divider(color: AppColors.gray, height: 1),
               const SizedBox(height: 12),
               Row(
                 children: [
-                  Expanded(
-                    child: _buildTicketAction(
-                      'Ver QR',
-                      Icons.qr_code_scanner,
-                      () => _showQRCode(ticketId),
-                    ),
-                  ),
-                  Container(
-                    width: 1,
-                    height: 20,
-                    color: AppColors.gray,
-                  ),
-                  Expanded(
-                    child: _buildTicketAction(
-                      'Compartir',
-                      Icons.share,
-                      () => _shareTicket(ticketId),
-                    ),
-                  ),
-                  Container(
-                    width: 1,
-                    height: 20,
-                    color: AppColors.gray,
-                  ),
-                  Expanded(
-                    child: _buildTicketAction(
-                      'Detalles',
-                      Icons.info_outline,
-                      () =>
-                          _showTicketDetails(ticketId, transport, route, price),
-                    ),
-                  ),
+                  Expanded(child: _ticketAction('Pasar', Icons.nfc, () => _openTapToPay(ticketId: ticket.id))),
+                  _vDivider(),
+                  Expanded(child: _ticketAction('Ver QR', Icons.qr_code_scanner, () => _showQRCode(ticket.id))),
+                  _vDivider(),
+                  Expanded(child: _ticketAction('Detalles', Icons.info_outline, () => _showTicketDetails(ticket))),
                 ],
               ),
             ],
@@ -878,73 +841,541 @@ class _TicketsPageState extends State<TicketsPage>
     );
   }
 
-  Widget _buildTicketAction(String label, IconData icon, VoidCallback onTap) {
+  Widget _ticketAction(String label, IconData icon, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
+      child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(icon, size: 16, color: AppColors.primary),
             const SizedBox(width: 4),
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 12,
-                color: AppColors.primary,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+            Text(label, style: const TextStyle(fontSize: 12, color: AppColors.primary, fontWeight: FontWeight.w500)),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildDateSection(String date) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Text(
-        date,
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-          color: AppColors.dark,
-        ),
-      ),
-    );
-  }
+  Widget _vDivider() => Container(width: 1, height: 20, color: AppColors.gray);
 
-  Widget _buildHistoryStat(String value, String label) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: AppColors.primary,
-          ),
+  // ----------------------------- Historial -----------------------------
+
+  Widget _buildHistorySection() {
+    // Tomamos todos los tickets (según filtros) y agrupamos por fecha (día)
+    final filtered = _applyFilters(_tickets);
+    final byDay = <String, List<Ticket>>{};
+    for (final t in filtered) {
+      final key = '${t.date.year}-${t.date.month.toString().padLeft(2, '0')}-${t.date.day.toString().padLeft(2, '0')}';
+      byDay.putIfAbsent(key, () => []).add(t);
+    }
+    final days = byDay.keys.toList()..sort((a, b) => b.compareTo(a)); // desc
+
+    if (days.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text('No hay historial para los filtros.', style: TextStyle(color: AppColors.brown.withOpacity(0.9))),
         ),
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 12,
-            color: AppColors.brown,
+      );
+    }
+
+    return ListView(
+      padding: const EdgeInsets.all(24),
+      children: [
+        // Resumen del mes (mock simple)
+        _monthSummary(filtered),
+        const SizedBox(height: 16),
+        for (final d in days) ...[
+          _dateHeader(d),
+          const SizedBox(height: 8),
+          for (final t in byDay[d]!) _ticketCard(
+            ticket: t,
+            status: t.state == TicketState.activo ? 'ACTIVO' : 'USADO',
+            statusColor: t.state == TicketState.activo ? AppColors.primary : const Color(0xFF4CAF50),
+            showActions: t.state == TicketState.activo,
+          ),
+          const SizedBox(height: 16),
+        ],
+        Center(
+          child: OutlinedButton(
+            onPressed: () => _snack('Cargando historial completo...'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.primary,
+              side: const BorderSide(color: AppColors.primary),
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text('Ver Historial Completo', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
           ),
         ),
       ],
     );
   }
 
-  IconData _getTransportIcon(String transport) {
-    if (transport.contains('Metro')) return Icons.train;
-    if (transport.contains('OMSA')) return Icons.directions_bus;
-    if (transport.contains('Teleférico')) return Icons.tram;
-    if (transport.contains('Corredor')) return Icons.directions_transit;
-    return Icons.confirmation_number;
+  Widget _monthSummary(List<Ticket> list) {
+    final total = _sumRD(list);
+    final viajes = list.length;
+    final fav = _favoriteTransport(list);
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 2))],
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(
+          _monthYear(DateTime.now()),
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.dark),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(child: _historyStat('$viajes', 'Viajes')),
+            Expanded(child: _historyStat(_fmtRD(total), 'Gastado')),
+            Expanded(child: _historyStat(fav, 'Favorito')),
+          ],
+        ),
+      ]),
+    );
   }
+
+  String _favoriteTransport(List<Ticket> list) {
+    final counts = <String, int>{};
+    for (final t in list) {
+      counts[t.transport] = (counts[t.transport] ?? 0) + 1;
+    }
+    if (counts.isEmpty) return '-';
+    final sorted = counts.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+    return sorted.first.key;
+  }
+
+  Widget _historyStat(String value, String label) {
+    return Column(
+      children: [
+        Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primary)),
+        Text(label, style: const TextStyle(fontSize: 12, color: AppColors.brown)),
+      ],
+    );
+  }
+
+  Widget _dateHeader(String isoDay) {
+    final parts = isoDay.split('-');
+    final date = DateTime(int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]));
+    return Text(
+      _humanDay(date),
+      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.dark),
+    );
+  }
+
+  // ----------------------------- Dashboard (e) -----------------------------
+
+  Widget _buildDashboard({
+    required List<Ticket> activos,
+    required List<Ticket> usados,
+    required List<Ticket> sinUsar,
+  }) {
+    // Totales
+    final totalGasto = _sumRD(_applyFilters(_tickets)); // aplica filtros globales
+    final gastoUsados = _sumRD(usados);
+    final gastoActivos = _sumRD(activos);
+    final gastoSinUsar = _sumRD(sinUsar);
+
+    // Por medio de transporte
+    final byTransport = <String, double>{};
+    for (final t in _applyFilters(_tickets)) {
+      byTransport[t.transport] = (byTransport[t.transport] ?? 0) + t.priceRD;
+    }
+
+    // Por ruta
+    final byRoute = <String, double>{};
+    for (final t in _applyFilters(_tickets)) {
+      byRoute[t.route] = (byRoute[t.route] ?? 0) + t.priceRD;
+    }
+    final topRoutes = byRoute.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    final showTop = topRoutes.take(5).toList();
+
+    return ListView(
+      padding: const EdgeInsets.all(24),
+      children: [
+        // Filtros de dashboard reutilizan los de arriba: chips + buscador ya aplican
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 2))],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Resumen por categoría', style: TextStyle(fontWeight: FontWeight.w800, color: AppColors.dark)),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(child: _summaryTile('Gastado (Total)', _fmtRD(totalGasto))),
+                  const SizedBox(width: 8),
+                  Expanded(child: _summaryTile('Usados', _fmtRD(gastoUsados))),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(child: _summaryTile('Activos', _fmtRD(gastoActivos))),
+                  const SizedBox(width: 8),
+                  Expanded(child: _summaryTile('Sin usar', _fmtRD(gastoSinUsar))),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        // Barras por medio de transporte
+        _sectionTitle('Gasto por medio de transporte'),
+        const SizedBox(height: 8),
+        if (byTransport.isEmpty)
+          _emptyHint('No hay datos para los filtros.')
+        else
+          _barList(byTransport),
+
+        const SizedBox(height: 16),
+
+        // Top rutas
+        _sectionTitle('Top rutas por gasto'),
+        const SizedBox(height: 8),
+        if (showTop.isEmpty)
+          _emptyHint('No hay datos para los filtros.')
+        else
+          _topRoutesList(showTop),
+      ],
+    );
+  }
+
+  Widget _summaryTile(String label, String value) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.light,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.gray.withOpacity(0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: const TextStyle(color: AppColors.brown, fontSize: 12)),
+          const SizedBox(height: 6),
+          Text(value, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: AppColors.dark)),
+        ],
+      ),
+    );
+  }
+
+  Widget _barList(Map<String, double> map) {
+    final maxVal = map.values.isEmpty ? 1 : map.values.reduce((a, b) => a > b ? a : b);
+    final entries = map.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    return Column(
+      children: [
+        for (final e in entries) ...[
+          _barRow(label: e.key, value: e.value, max: maxVal.toDouble()),
+          const SizedBox(height: 8),
+        ]
+      ],
+    );
+  }
+
+  Widget _barRow({required String label, required double value, required double max}) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.gray.withOpacity(0.2)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(label, style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.dark)),
+              const SizedBox(height: 6),
+              LayoutBuilder(
+                builder: (_, c) {
+                  final w = (value / max) * c.maxWidth;
+                  return Stack(
+                    children: [
+                      Container(
+                        height: 10,
+                        width: c.maxWidth,
+                        decoration: BoxDecoration(
+                          color: AppColors.light,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      Container(
+                        height: 10,
+                        width: w,
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ]),
+          ),
+          const SizedBox(width: 12),
+          Text(_fmtRD(value), style: const TextStyle(fontWeight: FontWeight.w800, color: AppColors.dark)),
+        ],
+      ),
+    );
+  }
+
+  Widget _topRoutesList(List<MapEntry<String, double>> items) {
+    return Column(
+      children: [
+        for (final e in items) ...[
+          Container(
+            padding: const EdgeInsets.all(12),
+            margin: const EdgeInsets.only(bottom: 8),
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.gray.withOpacity(0.2)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.route, color: AppColors.primary),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(e.key, style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.dark)),
+                ),
+                Text(_fmtRD(e.value), style: const TextStyle(fontWeight: FontWeight.w800, color: AppColors.dark)),
+              ],
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _emptyHint(String msg) => Padding(
+        padding: const EdgeInsets.all(12),
+        child: Text(msg, style: const TextStyle(color: AppColors.brown)),
+      );
+
+  Widget _sectionTitle(String text) => Text(
+        text,
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppColors.dark),
+      );
+
+  // ----------------------------- Acciones (c, d) -----------------------------
+
+  void _openTopUpSheet() {
+    final amountCtrl = TextEditingController(text: '200');
+    String payment = 'Tarjeta';
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) {
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 16,
+            right: 16,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+            top: 16,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(width: 36, height: 4, decoration: BoxDecoration(color: AppColors.gray, borderRadius: BorderRadius.circular(8))),
+              const SizedBox(height: 12),
+              const Text('Recargar tarjeta', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.gray.withOpacity(0.4)),
+                      ),
+                      child: TextField(
+                        controller: amountCtrl,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          hintText: 'Monto RD\$',
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                          prefixIcon: Icon(Icons.attach_money),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Wrap(
+                    spacing: 6,
+                    children: [100, 200, 300].map((v) {
+                      return GestureDetector(
+                        onTap: () => amountCtrl.text = v.toString(),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: AppColors.light,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: AppColors.gray.withOpacity(0.3)),
+                          ),
+                          child: Text('RD\$$v', style: const TextStyle(fontWeight: FontWeight.w700)),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  _payChip('Tarjeta', payment == 'Tarjeta', onTap: () => setState(() {})),
+                  const SizedBox(width: 8),
+                  _payChip('tPago', payment == 'tPago', onTap: () => setState(() {})),
+                  const SizedBox(width: 8),
+                  _payChip('PayPal', payment == 'PayPal', onTap: () => setState(() {})),
+                ],
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    final val = double.tryParse(amountCtrl.text.replaceAll(',', '.')) ?? 0.0;
+                    if (val <= 0) {
+                      Navigator.pop(context);
+                      _snack('Monto inválido');
+                      return;
+                    }
+                    setState(() => walletBalanceRD += val);
+                    Navigator.pop(context);
+                    _snack('Recarga exitosa: ${_fmtRD(val)}');
+                  },
+                  icon: const Icon(Icons.add_card),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: AppColors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  label: const Text('Recargar ahora'),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _payChip(String label, bool isSel, {required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSel ? AppColors.secondary : AppColors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: isSel ? AppColors.secondary : AppColors.gray.withOpacity(0.4)),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              label == 'Tarjeta'
+                  ? Icons.credit_card
+                  : label == 'tPago'
+                      ? Icons.phone_iphone
+                      : Icons.account_balance_wallet_outlined,
+              size: 16,
+              color: isSel ? AppColors.white : AppColors.dark,
+            ),
+            const SizedBox(width: 6),
+            Text(label, style: TextStyle(color: isSel ? AppColors.white : AppColors.dark, fontWeight: FontWeight.w600)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _openTapToPay({String? ticketId}) {
+    bool nfcEnabled = true;
+    showDialog(
+      context: context,
+      builder: (_) => StatefulBuilder(
+        builder: (context, setStateSB) {
+          return AlertDialog(
+            title: Row(
+              children: [
+                const Icon(Icons.nfc, color: AppColors.primary),
+                const SizedBox(width: 8),
+                Text(ticketId == null ? 'Pasar con el teléfono' : 'Pasar Ticket $ticketId'),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('NFC habilitado'),
+                  value: nfcEnabled,
+                  onChanged: (v) => setStateSB(() => nfcEnabled = v),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  width: 180,
+                  height: 180,
+                  decoration: BoxDecoration(
+                    color: AppColors.light,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppColors.gray.withOpacity(0.3)),
+                  ),
+                  child: const Center(
+                    child: Icon(Icons.qr_code, size: 120, color: AppColors.dark),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Acerca el teléfono al lector o muestra el QR.',
+                  style: TextStyle(color: AppColors.brown),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _snack('Acceso concedido ✅');
+                },
+                icon: const Icon(Icons.check_circle),
+                style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+                label: const Text('Simular acceso'),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  // ----------------------------- Detalles / QR -----------------------------
 
   void _showQRCode(String ticketId) {
     showDialog(
@@ -952,111 +1383,129 @@ class _TicketsPageState extends State<TicketsPage>
       builder: (context) => AlertDialog(
         title: Text('QR Code - $ticketId'),
         content: Container(
-          width: 200,
-          height: 200,
+          width: 220,
+          height: 220,
           decoration: BoxDecoration(
             color: AppColors.white,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: AppColors.gray),
           ),
-          child: const Icon(
-            Icons.qr_code,
-            size: 150,
-            color: AppColors.dark,
-          ),
+          child: const Icon(Icons.qr_code, size: 160, color: AppColors.dark),
         ),
         actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cerrar')),
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cerrar'),
+            onPressed: () {
+              Navigator.pop(context);
+              _snack('QR guardado en la galería (mock).');
+            },
+            child: const Text('Guardar'),
           ),
         ],
       ),
     );
   }
 
-  void _shareTicket(String ticketId) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Compartiendo ticket $ticketId'),
-        backgroundColor: AppColors.primary,
-      ),
-    );
-  }
-
-  void _showTicketDetails(
-      String ticketId, String transport, String route, String price) {
+  void _showTicketDetails(Ticket t) {
     showModalBottomSheet(
       context: context,
-      builder: (context) => Container(
+      backgroundColor: AppColors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) => Padding(
         padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Detalles del Ticket',
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: AppColors.dark,
-              ),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          const Text('Detalles del Ticket', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.dark)),
+          const SizedBox(height: 20),
+          _detailRow('Número:', t.id),
+          _detailRow('Transporte:', t.transport),
+          _detailRow('Ruta:', t.route),
+          _detailRow('Fecha:', _fmtDate(t.date)),
+          _detailRow('Precio:', _fmtRD(t.priceRD)),
+          _detailRow('Estado:', t.state == TicketState.activo ? 'Activo' : (t.state == TicketState.usado ? 'Usado' : 'Sin usar')),
+          const SizedBox(height: 20),
+          SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+              child: const Text('Cerrar'),
             ),
-            const SizedBox(height: 20),
-            _buildDetailRow('Número:', ticketId),
-            _buildDetailRow('Transporte:', transport),
-            _buildDetailRow('Ruta:', route),
-            _buildDetailRow('Precio:', price),
-            _buildDetailRow('Estado:', 'Activo'),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                ),
-                child: const Text('Cerrar'),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ]),
       ),
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
+  Widget _detailRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
-              color: AppColors.brown,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            value,
-            style: const TextStyle(
-              color: AppColors.dark,
-            ),
-          ),
-        ],
-      ),
+      child: Row(children: [
+        Text(label, style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.brown)),
+        const SizedBox(width: 8),
+        Expanded(child: Text(value, style: const TextStyle(color: AppColors.dark))),
+      ]),
     );
   }
 
-  void _showFullHistory() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Cargando historial completo...'),
-        backgroundColor: AppColors.primary,
-      ),
-    );
+  // ----------------------------- Utilidades -----------------------------
+
+  IconData _getTransportIcon(String transport) {
+    switch (transport) {
+      case 'Metro':
+        return Icons.train;
+      case 'OMSA':
+        return Icons.directions_bus;
+      case 'Teleférico':
+        return Icons.tram;
+      case 'Corredor':
+        return Icons.directions_transit;
+      default:
+        return Icons.confirmation_number;
+    }
+  }
+
+  void _snack(String msg) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+
+  String _fmtRD(double n) {
+    final intPart = n.floor();
+    final dec = ((n - intPart) * 100).round().toString().padLeft(2, '0');
+    final s = intPart.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
+    return 'RD\$$s.$dec';
+    // Si no quieres decimales usa: return 'RD\$${n.toStringAsFixed(0)}';
+  }
+
+  String _fmtDate(DateTime d) {
+    final months = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+    final hh = d.hour.toString().padLeft(2, '0');
+    final mm = d.minute.toString().padLeft(2, '0');
+    return '${d.day} ${months[d.month - 1]} ${d.year}, $hh:$mm';
+  }
+
+  String _humanDay(DateTime d) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final date = DateTime(d.year, d.month, d.day);
+    final diff = date.difference(today).inDays;
+    if (diff == 0) return 'Hoy - ${_dayMonth(d)}';
+    if (diff == -1) return 'Ayer - ${_dayMonth(d)}';
+    return _dayMonth(d);
+  }
+
+  String _dayMonth(DateTime d) {
+    final months = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+    return '${d.day} ${months[d.month - 1]} ${d.year}';
+  }
+
+  String _monthYear(DateTime d) {
+    final months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+    return '${months[d.month - 1]} ${d.year}';
   }
 }
+
+// ----------------------------- Profile Page -----------------------------
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -1069,123 +1518,79 @@ class ProfilePage extends StatelessWidget {
           padding: const EdgeInsets.all(24),
           child: Column(
             children: [
-              // Header
               Row(
                 children: [
                   CircleAvatar(
                     radius: 30,
                     backgroundColor: AppColors.primary,
-                    child: const Text(
-                      'S',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.white,
-                      ),
-                    ),
+                    child: const Text('S', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.white)),
                   ),
                   const SizedBox(width: 16),
                   const Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Sofia',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.white,
-                          ),
-                        ),
-                        Text(
-                          'Ciudadana',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: AppColors.gray,
-                          ),
-                        ),
-                        Text(
-                          '1200 puntos',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                        Text('Sofia', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.white)),
+                        Text('Ciudadana', style: TextStyle(fontSize: 16, color: AppColors.gray)),
+                        Text('1200 puntos',
+                            style: TextStyle(fontSize: 14, color: AppColors.primary, fontWeight: FontWeight.w600)),
                       ],
                     ),
                   ),
                 ],
               ),
-
               const SizedBox(height: 32),
-
-              // Menú de opciones
               Expanded(
                 child: Container(
                   decoration: const BoxDecoration(
                     color: AppColors.light,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(24),
-                      topRight: Radius.circular(24),
-                    ),
+                    borderRadius: BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
                   ),
                   child: ListView(
                     padding: const EdgeInsets.all(24),
                     children: [
-                      _buildProfileOption(
+                      _profileOption(
                         context,
                         'Desafíos de Tráfico',
                         'Pon a prueba tus conocimientos',
                         Icons.quiz,
                         AppColors.primary,
-                        () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const TrafficChallengesPage(),
-                            ),
-                          );
-                        },
+                        () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const TrafficChallengesPage()),
+                        ),
                       ),
                       const SizedBox(height: 16),
-                      _buildProfileOption(
+                      _profileOption(
                         context,
                         'Mis Documentos',
                         'Licencia, seguros y multas',
                         Icons.description,
                         AppColors.secondary,
-                        () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const DocumentsPage(),
-                            ),
-                          );
-                        },
+                        () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const DocumentsPage()),
+                        ),
                       ),
                       const SizedBox(height: 16),
-                      _buildProfileOption(
+                      _profileOption(
                         context,
                         'Historial de Tickets',
                         'Ver tickets anteriores',
                         Icons.receipt_long,
                         AppColors.brown,
-                        () {
-                          print('Historial pressed');
-                        },
+                        () => ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Historial desde perfil próximamente.')),
+                        ),
                       ),
                       const SizedBox(height: 16),
-                      _buildProfileOption(
+                      _profileOption(
                         context,
                         'Configuración',
                         'Ajustes de la aplicación',
                         Icons.settings,
                         AppColors.gray,
-                        () {
-                          print('Configuración pressed');
-                        },
+                        () {},
                       ),
                     ],
                   ),
@@ -1198,8 +1603,7 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileOption(BuildContext context, String title,
-      String subtitle, IconData icon, Color color, VoidCallback onTap) {
+  Widget _profileOption(BuildContext context, String title, String subtitle, IconData icon, Color color, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -1207,57 +1611,24 @@ class ProfilePage extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 2))],
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                icon,
-                color: color,
-                size: 24,
-              ),
+              decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+              child: Icon(icon, color: color, size: 24),
             ),
             const SizedBox(width: 16),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.dark,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: AppColors.brown,
-                    ),
-                  ),
-                ],
-              ),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.dark)),
+                const SizedBox(height: 4),
+                Text(subtitle, style: const TextStyle(fontSize: 14, color: AppColors.brown)),
+              ]),
             ),
-            const Icon(
-              Icons.arrow_forward_ios,
-              color: AppColors.gray,
-              size: 16,
-            ),
+            const Icon(Icons.arrow_forward_ios, color: AppColors.gray, size: 16),
           ],
         ),
       ),

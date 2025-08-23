@@ -174,6 +174,8 @@ class _OMSAPageState extends State<OMSAPage> {
                 _buildFilterChip('Rutas Principales', true),
                 const SizedBox(width: 12),
                 _buildFilterChip('Zona Norte', false),
+                const SizedBox(width: 12),
+                _buildFilterChip('Favoritos', false),
               ],
             ),
           ),

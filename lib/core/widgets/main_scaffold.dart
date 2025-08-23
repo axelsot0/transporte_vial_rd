@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:transporte_vial_rd/features/transport/presentation/pages/route_details_page.dart';
-import 'package:transporte_vial_rd/features/transport/presentation/pages/favorites_page.dart';
 import '../constants/app_colors.dart';
 import '../../features/transport/presentation/pages/home_page.dart';
 import '../../features/education/presentation/pages/traffic_challenges_page.dart';
@@ -154,14 +153,7 @@ class LocationPage extends StatelessWidget {
                         'Tus destinos y rutas favoritas',
                         Icons.bookmark,
                         AppColors.brown,
-                        () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => FavoritesPage(),
-                            ),
-                          );
-                        },
+                        () {},
                       ),
                     ],
                   ),

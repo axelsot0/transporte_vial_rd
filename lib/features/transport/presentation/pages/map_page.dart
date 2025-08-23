@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:transporte_vial_rd/widgets/external_map_view.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../tickets/presentation/pages/purchase_ticket_page.dart';  // Agregar esta línea
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:transporte_vial_rd/widgets/external_map_iframe.dart'; // ajusta el import
 class MapPage extends StatefulWidget {
   final String routeName;
   final String transportType;
@@ -59,8 +59,8 @@ class _MapPageState extends State<MapPage> {
     child: ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: kIsWeb
-          ? const ExternalMapIFrame(
-              src: 'https://storage.googleapis.com/maps-solutions-nevyv1dmhm/commutes/5663/commutes.html',
+          ? const ExternalMapView(
+              url: 'https://storage.googleapis.com/maps-solutions-nevyv1dmhm/commutes/5663/commutes.html',
             )
           : const Center(
               child: Text('El mapa embebido por iframe está disponible en Web'),

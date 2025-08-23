@@ -214,6 +214,8 @@ class _MetroPageState extends State<MetroPage> {
                 _buildFilterChip('L–S 5:30–22:30', true),
                 const SizedBox(width: 12),
                 _buildFilterChip('D 6:00–22:00', false),
+                const SizedBox(width: 12),
+                _buildFilterChip('Favoritos', false),
               ],
             ),
           ),

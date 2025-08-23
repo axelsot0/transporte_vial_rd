@@ -174,6 +174,8 @@ class _CorredorPageState extends State<CorredorPage> {
                 _buildFilterChip('Rutas Rápidas', true),
                 const SizedBox(width: 12),
                 _buildFilterChip('Express', false),
+                const SizedBox(width: 12),
+                _buildFilterChip('Favoritos', false),
               ],
             ),
           ),

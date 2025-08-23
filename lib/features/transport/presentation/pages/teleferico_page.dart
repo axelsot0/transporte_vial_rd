@@ -174,6 +174,8 @@ class _TelefericoPageState extends State<TelefericoPage> {
                 _buildFilterChip('Línea Principal', true),
                 const SizedBox(width: 12),
                 _buildFilterChip('Estaciones', false),
+                const SizedBox(width: 12),
+                _buildFilterChip('Favoritos', false),
               ],
             ),
           ),

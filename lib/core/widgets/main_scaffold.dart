@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:transporte_vial_rd/features/transport/presentation/pages/favorites_page.dart';
 import '../constants/app_colors.dart';
 import '../../features/transport/presentation/pages/home_page.dart';
 import '../../features/education/presentation/pages/traffic_challenges_page.dart'; // Agregar esta línea
@@ -162,7 +163,12 @@ class LocationPage extends StatelessWidget {
                         Icons.bookmark,
                         AppColors.brown,
                         () {
-                          print('Favoritos pressed');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => FavoritesPage(),
+                            ),
+                          );
                         },
                       ),
                     ],
